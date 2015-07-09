@@ -1,6 +1,7 @@
 # OBET
-A website in Python. Will eventually use flask.
+A website in Python using Flask.
 
-The file available right now is simply to allow me to get in some basic
-ideas of how things will run before my Flask lesson with Lynn this
-Sunday.
+The starter for the Flask usage is up at the moment.
+Currently it can pull data from the DB.
+
+Insert is next on the list.
