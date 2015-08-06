@@ -18,9 +18,11 @@ $ python hello.py runserver
 
 To test on the command line:
 $ python hello.py shell
+
 When using on the command line, the app, db, and User are already imported.
 You must import anything else you would like to use.
 
 The database is MongoDB and connects as a MongoEngine app.
+
 MongoEngine does queries differently from MongoDB, but I believe
 both types of queries can be done here.
