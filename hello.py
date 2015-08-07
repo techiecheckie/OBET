@@ -37,7 +37,7 @@ app.config['MONGODB_SETTINGS'] = {
 #    Init     #
 ###############
 
-# Actually connects to the DB	
+# Actually connects to the DB
 def connect_db():
 	connection = connect(app.config['MONGO_DBNAME'], username = app.config['MONGO_USERNAME'], password = app.config['MONGO_PASSWORD'], host = app.config['MONGO_URI'])
 	print('Connected to DB.')
@@ -46,11 +46,11 @@ def connect_db():
 def get_db():
 	db = connect_db()
 	db = db[app.config['MONGO_DBNAME']]
-	
+
     	# Authenticate that connection
     	db.authenticate(app.config['MONGO_USERNAME'], app.config['MONGO_PASSWORD'])
     	return db
-	
+
 
 manager = Manager(app)
 bootstrap = Bootstrap(app)
@@ -61,7 +61,7 @@ db = MongoEngine(app)
 
 ##################
 #    Errors      #
-##################	
+##################
 @app.errorhandler(404)
 def page_not_found(e):
 	return render_template('404.html'), 404
@@ -96,7 +96,7 @@ def index():
  	user = User.objects(name__iexact = form.name.data).first()
  	if user is None:
  		flash("You don't seem to be in the database!")
- 		newUser = User(name=form.name.data).save()
+ 		newUser = User(name=form.name.data, email=(form.data.name+'@OBET.com')).save()
  		flash("No worries, you've been added!")
  		session['known'] = False
  		if app.config['OBET_ADMIN']:
@@ -108,7 +108,7 @@ def index():
  	form.name.data = ''
  	return redirect(url_for('index'))
  return render_template('index.html', form = form, name = session.get('name'))
- 
+
 
 """@app.route('/', methods=['GET', 'POST'])
 def index():
@@ -128,7 +128,7 @@ def index():
  		#form.name.data = ''
  		return redirect(url_for('index'))
  	return render_template('index.html', form = form, name = session.get('name'), known = session.get('known', False))"""
- 	 
+
 @app.route('/user/<name>')
 def user(name):
 	return render_template('user.html', name = name)
@@ -146,11 +146,11 @@ class User(db.Document):
     	site = db.URLField(max_length = 200, default = None)
     	description = db.StringField(max_length = 500) #, required = True)
     	#u_edit_record = ListField(EmbeddedDocumentField(UserEditRecord), default = [])
-    	
+
     	#def __repr__(self):
  	#	return '<User %r %r %r %r>' % self.name, self.email, self.hashPass
-    	
- 
+
+
 class Lit(db.Document):
     	refType = db.StringField(max_length = 30, required = True)
     	title = db.StringField(max_length = 120, required = True)
@@ -162,7 +162,7 @@ class Lit(db.Document):
     	tags = db.ListField(StringField(max_length = 30), default = [])
     	link = db.URLField(max_length = 200, default = None)
     	#l_edit_record = ListField(EmbeddedDocumentField(LitEditRecord), default = [])
-    	
+
     	def __repr__(self):
  		return '<Lit %r>' % self.title
 
@@ -213,7 +213,7 @@ def send_email(to, subject, template, **kwargs):
  	thr = Thread(target = send_async_email, args = [app, msg])
 	thr.start()
  	return thr
- 	
+
 
 
 
