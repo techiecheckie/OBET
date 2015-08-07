@@ -96,7 +96,7 @@ def index():
  	user = User.objects(name__iexact = form.name.data).first()
  	if user is None:
  		flash("You don't seem to be in the database!")
- 		newUser = User(name=form.name.data).save()
+ 		newUser = User(name=form.name.data, email=(form.data.name+'@OBET.com')).save()
  		flash("No worries, you've been added!")
  		session['known'] = False
  		if app.config['OBET_ADMIN']:
