@@ -9,29 +9,17 @@ from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 
+from dotenv import parse_dotenv, load_dotenv
+
 ##################
 #    Config      #
 ##################
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'LSKFJDSLf84wi7rleIFdso8fsL9F87SDAOIFUSOH87FS70Q03958734LKdllkjdsflskjf'
-
-###################
-#    DB Config    #
-###################
-
-app.config['MONGO_URI'] = 'mongodb://mikachama:Haruka10@ds033419.mongolab.com:33419/inventory'
-app.config['MONGODB_HOST'] = 'ds033419.mongolab.com'
-app.config['MONGODB_PORT'] = 33419
-app.config['MONGO_DBNAME'] = 'inventory'
-app.config['MONGODB_USERNAME'] = 'mikachama'
-app.config['MONGODB_PASSWORD'] = 'Haruka10'
-app.config['ADMIN_EMAIL'] = 'admin@admin.com'
-app.config['ADMIN_PASS'] = 'testerpassword'
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'inventory',
-    'host': 'mongodb://mikachama:Haruka10@ds033419.mongolab.com:33419/inventory'
-}
-
+try:
+    load_dotenv('.env')
+    app.config.update(parse_dotenv('.env'))
+except TypeError:
+    print('Error parsing .env')
 
 ###############
 #    Init     #
@@ -177,19 +165,6 @@ def make_shell_context():
 
 manager.add_command("shell", Shell(make_context = make_shell_context))
 
-
-#####################
-#    Mail Config    #
-#####################
-import os
-app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['OBET_MAIL_SUBJECT_PREFIX'] = '[OBET]'
-app.config['OBET_MAIL_SENDER'] = 'OBET Admin <obet.correspondence@gmail.com>'
-app.config['OBET_ADMIN'] = os.environ.get('OBET_ADMIN')
 
 #####################################
 #     Asynchronous Mail Support     #
