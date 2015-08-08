@@ -21,6 +21,11 @@ try:
 except TypeError:
     print('Error parsing .env')
 
+app.config['MONGODB_SETTINGS'] = {
+    'db': app.config['MONGO_DBNAME'],
+    'host': app.config['MONGO_URI'],
+}
+
 ###############
 #    Init     #
 ###############
