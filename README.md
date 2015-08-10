@@ -7,10 +7,10 @@ Current issue is that for some reason, the MAIL_USERNAME/PASSWORD variables cann
 from the environment and must be put in manually. :(
 
 To run this app (on Linux):
-$ python hello.py runserver -dr
+$ python manage.py runserver -dr
 
 To test on the command line (also on Linux):
-$ python hello.py shell
+$ python manage.py shell
 
 When using on the command line, the app, db, User, Lit, and Role are already imported.
 
