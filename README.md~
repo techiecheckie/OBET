@@ -13,6 +13,3 @@ To test on the command line (also on Linux):
 $ python hello.py shell
 
 When using on the command line, the app, db, User, Lit, and Role are already imported.
-
-To test queries on Lit objects, you can use 'Book' and 'Biology Book' in the title field.
-These are already stored in the DB.

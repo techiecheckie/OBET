@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}OBET - Precise Search For Literature{% endblock %}
+{% block page_content %}
+<div class="page-header">
+ <h1>Search For Literature</h1>	
+</div>
+
+<div class="col-md-4">
+
+{% for l in lit %}
+
+	<P>{{l.refType}}</p>
+	<p>{{l.title}}</p>
+	<p>{{l.author}}</p>
+	<p>{{l.description}}</p>
+
+{% endfor %}
+ 
+ {{ wtf.quick_form(form) }}
+ <p>
+ <br>
+ Rather do a less strict search?
+ <a href="{{ url_for('main.search') }}">
+ Go here instead
+ </a>
+</p>
+</div>
+{% endblock %}
