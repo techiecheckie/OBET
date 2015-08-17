@@ -59,14 +59,30 @@ def confirm(token):
 @auth.before_app_request
 def before_request():
  	if current_user.is_authenticated() and not current_user.confirmed and request.endpoint[:5] != 'auth.':
- 		print "Before request function not working for some reason."
+ 		#print "Before request function not working for some reason."
  		return redirect(url_for('auth.unconfirmed'))
+ 	#if current_user.is_authenticated() and not current_user.activated and request.endpoint[:5] != 'auth.':
+ 	#	return redirect(url_for('auth.deactivated'))
+ 	
+#@auth.before_app_request
+#def before_request():
+# 	if current_user.is_authenticated():
+# 		current_user.ping()
+# 		if not current_user.confirmed and request.endpoint[:5] != 'auth.':
+# 			return redirect(url_for('auth.unconfirmed'))
 
 @auth.route('/unconfirmed')
 def unconfirmed():
  	if current_user.is_anonymous() or current_user.confirmed:
  		return redirect('main.index')
  	return render_template('auth/unconfirmed.html')
+
+## Cannot test activation until users in the DB are updated
+#@auth.route('/deactivated')
+#def deactivated():
+# 	if not current_user.activated:
+# 		return redirect('main.index')
+# 	return render_template('auth/deactivated.html')
 
 from ..email import send_email
 @auth.route('/confirm')

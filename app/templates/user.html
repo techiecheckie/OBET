@@ -1,7 +1,19 @@
-{% extends "base.html" %}
-{% block title %}OBET{% endblock %}
 {% block page_content %}
 <div class="page-header">
- 	<h1>Hello, {{ name }}!</h1>
+ <h1>{{ user.name }}</h1>
+ <p>
+ {% if user.name %}{{ user.name }}{% endif %}
+ </p>
+ <p>
+ {% if user.credentials %}{{ user.credentials }}{% endif %}
+ </p>
+ {% if current_user.is_administrator() %}
+ <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+ {% endif %}
+ {% if user.description %}<p>{{ user.description }}</p>{% endif %}
+ {% if user == current_user %}
+	<a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile
+	</a>
+{% endif %}
 </div>
 {% endblock %}

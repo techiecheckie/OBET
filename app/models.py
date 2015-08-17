@@ -4,7 +4,6 @@ from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
 from flask.ext.login import UserMixin, AnonymousUserMixin
 
 
@@ -20,7 +19,16 @@ class User(UserMixin, db.Document):
     	site = db.URLField(max_length = 200, default = None)
     	description = db.StringField(max_length = 500) #, required = True)
     	confirmed = db.BooleanField(default = False)
+    	activated = db.BooleanField(default = True)
     	role = db.ReferenceField('Role')
+    	#member_since = db.DateTimeField(default = datetime.utcnow)
+ 	#last_seen = db.DateTimeField(default = datetime.utcnow)
+    	meta = {'indexes': [
+    		{'fields': ['$email', '$name'],
+    		 'default_language': 'english',
+    		 'weight': {'email': 100, 'name': 50}
+    		}
+    	]}
     	#u_edit_record = ListField(EmbeddedDocumentField(UserEditRecord), default = [])
         		
     	def __repr__(self):
@@ -64,6 +72,19 @@ class User(UserMixin, db.Document):
  		self.confirmed = True
  		self.save()
  		return True
+ 	
+ 	### Reactivate when DB objects are updated.
+ 	#def activate(self):
+ 	#	if self.activated:
+ 	#		self.activated = False
+ 	#	else:
+ 	#		self.activated = True
+ 	#	self.save()
+ 	#	return True
+ 	
+ 	#def ping(self):
+ 	#	self.last_seen = datetime.utcnow()
+ 	#	self.save()
 
 	def __init__(self, **kwargs):
  		super(User, self).__init__(**kwargs)
@@ -93,11 +114,17 @@ class Lit(db.Document):
     	title = db.StringField(max_length = 120, required = True, unique = True)
     	author = db.StringField(max_length = 30, required = True, unique_with = ['title'])
     	description = db.StringField(max_length = 500, required = True)
-    	edition = db.IntField(default = -1)
+    	edition = db.IntField(default = None)
     	pages = db.StringField(default = None)
     	yrPublished = db.IntField(min_value = 1800, default = None) # MUST ADD max_value!!! Limit it to THIS year!!
     	tags = db.ListField(StringField(max_length = 30), default = [])
     	link = db.URLField(max_length = 200, default = None)
+    	meta = {'indexes': [
+    		{'fields': ['$title', '$author', "$description"],
+    		 'default_language': 'english',
+    		 'weight': {'title': 100, 'author': 50, 'description': 10}
+    		}
+    	]}
     	#l_edit_record = ListField(EmbeddedDocumentField(LitEditRecord), default = [])
 
     	def __repr__(self):
@@ -124,7 +151,7 @@ class Role(db.Document):
             		'Administrator': (0xff, False)
         	}
         	for r in roles:
-            		role = Role.objects(name__iexact = r).first()
+            		role = Role.objects(name__iexact = 'User').first()
             		if role is None:
                 		role = Role(name = r)
             		role.permissions = roles[r][0]
