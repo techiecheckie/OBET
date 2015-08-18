@@ -95,14 +95,14 @@ def exactSearch():
  return render_template('exactSearch.html', form = form)
 
 
-#@main.route('/lit/<title>')
+#@main.route('/lit/<title>', methods=['GET', 'POST'])
 #def lit(title):
 #	lit = Lit.objects(title__iexact = title).first()
 #	if lit is None:
 #		abort(404)
 #	 return render_template('lit.html', lit = lit)
 
-@main.route('/user/<email>')
+@main.route('/user/<email>', methods=['GET', 'POST'])
 def user(email):
 	user = User.objects(email__iexact = email).first()
 	if user is None:
