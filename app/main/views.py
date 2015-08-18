@@ -111,7 +111,7 @@ def user(email):
 
 
 
-@main.route('/addLit')
+@main.route('/addLit', methods=['GET', 'POST'])
 @login_required
 def addLit():
 	isUpdate = False
@@ -123,11 +123,10 @@ def addLit():
 		# and then update or add based on that
 		#########################################################
 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data).first()
-		if len(lit) != 0:
+		if lit is not None:
  			flash("This is already in the DB. Updating instead.")
 			isUpdate = True
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data)
-		flash("Problem is not with creating object but with saving object.")
 		lit.save()
 		if isUpdate:
 			flash("Updated the entry.")
@@ -166,7 +165,7 @@ def edit_profile():
 #changePass
 
 from ..decorators import admin_required, permission_required, user_required
-@main.route('/deleteLit')
+@main.route('/deleteLit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def deleteLit():
@@ -186,7 +185,7 @@ def deleteLit():
  		return redirect(url_for('main.deleteLit'))
  	return render_template('deleteLit.html', form = form)
 
-@main.route('/deleteUser')
+@main.route('/deleteUser', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def deleteUser():
