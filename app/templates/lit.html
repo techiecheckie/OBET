@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 {% block page_content %}
 <div class="page-header">
  <h1>{{ lit.title }}</h1>
@@ -28,10 +30,6 @@
  	</ul>
  {% endif %}
  </p>
- 
- <p>
- First added {{ moment(lit.first_added).format('L') }}.
- Last edited {{ moment(user.last_edited).fromNow() }}.
- </p>
+
 </div>
 {% endblock %}
