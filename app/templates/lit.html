@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% block title %}OBET - Literature Profile{% endblock %}
 {% block page_content %}
 <div class="page-header">
  <h1>{{ lit.title }}</h1>
@@ -31,5 +32,10 @@
  {% endif %}
  </p>
 
+ {% if current_user.is_administrator() %}
+ <p>
+ <a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}"><button type="button">Delete</button></a>
+ </p>
+  {% endif %}
 </div>
 {% endblock %}

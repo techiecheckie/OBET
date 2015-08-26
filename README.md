@@ -1,18 +1,31 @@
 A website in Python using Flask.
 
+The dependencies needed are:
+flask, 
+flask-mongoengine, 
+flask-wtf, 
+flask-bootstrap, 
+flask-moment, 
+flask-script, 
+flask-mail, 
+wtforms
+
 It's suggested that you install a virtual environment (virtualenv), and then install
 all dependencies there.
 
-Current issue is that for some reason, the MAIL_USERNAME/PASSWORD variables cannot be read
-from the environment and must be put in manually. :(
+Current issue is that the database can save and find properly through the command line,
+but is having troubles from the front end.
 
 To run this app (on Linux):
-$ python manage.py runserver -dr
+$ python hello.py runserver
 
 To test on the command line (also on Linux):
-$ python manage.py shell
+$ python hello.py shell
 
-When using on the command line, the app, db, User, Lit, and Role are already imported.
+When using on the command line, the app, db, and User are already imported.
+You must import anything else you would like to use.
 
-To test queries on Lit objects, you can use 'Book' and 'Biology Book' in the title field.
-These are already stored in the DB.
+The database is MongoDB and connects as a MongoEngine app.
+
+MongoEngine does queries differently from MongoDB, but I believe
+both types of queries can be done here.

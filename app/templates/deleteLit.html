@@ -9,12 +9,14 @@
 <div class="col-md-4">
 
 {% for l in lit %}
-	<p>{{l.id}}</p>
-	<P>{{l.refType}}</p>
-	<p>{{l.title}}</p>
-	<p>{{l.author}}</p>
-	<p>{{l.description}}</p>
-
+ <a href="{{ url_for('main.lit', title = l.title) }}"><button type="button">
+ 	<p>Title: {{l.title}}</p>
+	<p>Type: {{l.refType}}</p>
+	<p>Author: {{l.author}}</p>
+	<p>Description: {{l.description}}</p>
+</button></a>
+<br>
+<br>
 {% endfor %}
  
 {{ wtf.quick_form(form) }}

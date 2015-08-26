@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, session, redirect, url_for, flash
 from . import main
-from .forms import NameForm, SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm
+from .forms import NameForm, SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit
 from flask.ext.login import login_required, current_user
@@ -95,14 +95,11 @@ def exactSearch():
  return render_template('exactSearch.html', form = form)
 
 
-#@main.route('/lit/<title>', methods=['GET', 'POST'])
-#def lit(title):
-#	lit = Lit.objects(title__iexact = title).first()
-#	if lit is None:
-#		abort(404)
-#	 return render_template('lit.html', lit = lit)
+#####################
+# User Profile Page #
+#####################
 
-@main.route('/user/<email>', methods=['GET', 'POST'])
+@main.route('/user/<email>')
 def user(email):
 	user = User.objects(email__iexact = email).first()
 	if user is None:
@@ -110,6 +107,21 @@ def user(email):
 	return render_template('user.html', user = user)
 
 
+#################
+# Lit Main Page #
+#################
+
+@main.route('/lit/<title>')
+def lit(title):
+	lit = Lit.objects(title__iexact = title).first()
+	if lit is None:
+		abort(404)
+	return render_template('lit.html', lit = lit)
+
+
+###########
+# Add Lit #
+###########
 
 @main.route('/addLit', methods=['GET', 'POST'])
 @login_required
@@ -124,18 +136,20 @@ def addLit():
 		#########################################################
 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data).first()
 		if lit is not None:
- 			flash("This is already in the DB. Updating instead.")
-			isUpdate = True
+ 			flash("This is already in the DB.")
+ 			## Change addLit to updateLit.
+			return render_template('addLit.html', form = form)
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data)
 		lit.save()
-		if isUpdate:
-			flash("Updated the entry.")
-		else:
-			flash("Added new entry to the DB.")				
+		flash("Successfully added!")				
  		return redirect(url_for('main.addLit'))
  	return render_template('addLit.html', form = form)
- 
 
+
+################
+# Edit Profile #
+################
+## Need to add the update into this.
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -164,6 +178,12 @@ def edit_profile():
 #changeEmail
 #changePass
 
+
+#################################
+# Delete Lit Main Page Function #
+#################################
+
+
 from ..decorators import admin_required, permission_required, user_required
 @main.route('/deleteLit', methods=['GET', 'POST'])
 @login_required
@@ -171,19 +191,37 @@ from ..decorators import admin_required, permission_required, user_required
 def deleteLit():
  	form = DeleteLitForm()
  	if form.validate_on_submit():
-		#########################################################
-		# What should be here instead is an icontains statement showing the user similar entries
-		# It should then allow the user to select if they would like to delete or not,
-		# and then delete based on that
-		#########################################################
-		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data).first()
-		if lit is None:
- 			flash("No literature like this in the database.")
+		queryString = str(form.search.data)
+ 		lit = Lit.objects.search_text(queryString).order_by('$text_score')
+		if len(lit) == 0:
+ 			flash("Your search returned nothing. Try other search terms.")
  		else:
- 			lit.delete()
- 			flash(form.title.data + " literature has been deleted!")				
+ 			return render_template('deleteLit.html', form = form, lit = lit)
  		return redirect(url_for('main.deleteLit'))
  	return render_template('deleteLit.html', form = form)
+
+
+##############################
+# Delete Lit Helper Function #
+##############################
+
+@main.route('/lit/<lit_id>/delete', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def deleteLiterature(lit_id):
+	lit = Lit.objects( id__exact = lit_id)
+	if lit is None:
+		flash("No literature like this in the database.")
+	else:
+		lit.delete()
+		flash("Literature has been deleted!")				
+	return redirect(url_for('main.search'))
+
+
+###############
+# Delete User #
+###############
+## Does not work the way we want, yet.
 
 @main.route('/deleteUser', methods=['GET', 'POST'])
 @login_required
@@ -201,15 +239,3 @@ def deleteUser():
  	return render_template('deleteUser.html', form = form)
  	
  	
-
- 	
-#@main.route('/<name>/deleteUser/<userEmail>')
-#@login_required
-#@admin_required
-#def confirmDeleteUser():
-#	form = ConfirmDeleteUserForm()
-#	if form.validate_on_submit():
-#		user.delete()
- #		flash("User deleted.")				
- #		return redirect(url_for('main.deleteUser'))
- #	return render_template('deleteUser.html', name = current_user.name, form = form)

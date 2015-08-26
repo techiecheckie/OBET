@@ -44,10 +44,11 @@ class DeleteLitForm(Form):
 
 class EditProfileForm(Form):
  	name = StringField('Name', validators=[Length(0, 64)])
+ 	#credentials = StringField('Credentials', validators=[Length(0, 64)])
  	email = StringField('Email', validators=[Length(0, 64)])
- 	location = StringField('Location', validators=[Length(0, 64)])
+ 	#location = StringField('Location', validators=[Length(0, 64)])
  	description = TextAreaField('About me')
- 	submit = SubmitField('Submit')
+ 	submit = SubmitField('Update Profile')
     	
 #class ConfirmDeleteUserForm(Form):
 #	delete = BooleanField('Delete this user? It can\'t be taken back!', default = False, validators = [Required()])
