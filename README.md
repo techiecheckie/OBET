@@ -1,6 +1,5 @@
 # OBET
 ======
-
 #### A library site made in Python using the Flask framework.
 
 **Creator Notes:** *This README will contain a detailed set of basic instructions on working this site, with the assumption that the person to take it over is a junior or senior CS student with little to no knowledge of full stack web application development.*
@@ -27,11 +26,14 @@ Before beginning, the computer should be prepared with python and a python insta
 	
 Open a terminal/console and type:
 	`sudo apt-get install build-essential checkinstall`
+
 	`sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
 This globally installs necessary dependencies.
 
 	`sudo` makes the installation global, and may require a password from you.
+	
 	`apt-get` grabs the applications you want to install.
+	
 	`install` is self-explanatory and following that are the list of items you want to install, separated by a space.
 
 There are a ton of different ways to install Python, particularly if you want Python 2.7,
@@ -61,6 +63,7 @@ Back in the console, type:
 
 Finally, to pull the code from the repo into your folder, type in the console:
 	`git fetch upstream` -- this grabs the aforementioned connection
+	
 	`git merge upstream/master` or `git pull upstream master` -- this merges and/or pulls the code from the repo
 
 To use the repo and submit your changes later on, navigate to the appropriate folder in the command line.
@@ -79,6 +82,7 @@ Virtualenv makes a virtual environment on your computer that will allow you to i
 	
 In the console, type:
 	`pip install virtualenv` -- installs virtualenv
+	
 	`cd OBET` -- navigate to the appropriate directory with your project, whatever its name.
 	`virtualenv venv` -- creates a virtual environment with the name you give it, in this case venv
 
@@ -92,6 +96,7 @@ Read more about [virtualenv] (http://docs.python-guide.org/en/latest/dev/virtual
 
 In the console, type:
 	`source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
+	
 	`pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
 
 ##### Get the environment variables set up. (More on this later.)
