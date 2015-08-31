@@ -25,17 +25,13 @@ Before beginning, the computer should be prepared with python and a python insta
 * Ubuntu 14.04 comes with Python 3.4 installed
 	
 Open a terminal/console and type:
-`sudo apt-get install build-essential checkinstall`
-
-`sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
+* `sudo apt-get install build-essential checkinstall`
+* `sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
 
 This globally installs necessary dependencies.
-
-`sudo` makes the installation global, and may require a password from you.
-	
-`apt-get` grabs the applications you want to install.
-	
-`install` is self-explanatory and following that are the list of items you want to install, separated by a space.
+* `sudo` makes the installation global, and may require a password from you.
+* `apt-get` grabs the applications you want to install.
+* `install` is self-explanatory and following that are the list of items you want to install, separated by a space.
 
 There are a ton of different ways to install Python, particularly if you want Python 2.7,
 and they can be easily found by looking up installation of Python.
@@ -44,34 +40,27 @@ and they can be easily found by looking up installation of Python.
 pip is a package installer for Python packages. It will make your life much easier.
 
 In the console, type:
-
-`sudo apt-get install pip` -- installs pip globally
+* `sudo apt-get install pip` -- installs pip globally
 	
 ##### Install git if you don't have it, make a github account, grab the code from the repo.
 Git is a command line version control system that allows you to keep track of your code.
 Github allows you to store your code elsewhere so it's never lost no matter what.
 
 In the console, type:
-
-`sudo apt-get install git` -- installs git globally
-
-`cd OBET` -- switches to a folder called OBET if it exists, otherwise makes one and switches there.
-
-`git init` -- starts the folder as a git project
+* `sudo apt-get install git` -- installs git globally
+* `cd OBET` -- switches to a folder called OBET if it exists, otherwise makes one and switches there.
+* `git init` -- starts the folder as a git project
 
 After making an account on github, go [here] (https://github.com/techiecheckie/OBET/) and [fork, then clone the project] (https://guides.github.com/activities/forking/).
 
 To connect to github from your computer, you will need to [generate and add an SSH key] (https://help.github.com/articles/generating-ssh-keys/) to be allowed to do so.
 
 Back in the console, type:
-
-`git remote add upstream git@github.com:techiecheckie/OBET.git` -- this creates a connection to the repo
+* `git remote add upstream git@github.com:techiecheckie/OBET.git` -- this creates a connection to the repo
 
 Finally, to pull the code from the repo into your folder, type in the console:
-
-`git fetch upstream` -- this grabs the aforementioned connection
-	
-`git merge upstream/master` or `git pull upstream master` -- this merges and/or pulls the code from the repo
+* `git fetch upstream` -- this grabs the aforementioned connection
+* `git merge upstream/master` or `git pull upstream master` -- this merges and/or pulls the code from the repo
 
 To use the repo and submit your changes later on, navigate to the appropriate folder in the command line.
 There are 3 steps to push your changes to the github repo.
@@ -89,12 +78,9 @@ If interested, read up on [git] (https://git-scm.com/download/linux) and [github
 Virtualenv makes a virtual environment on your computer that will allow you to install certain python packages, but only within a specific folder. It essentially protects your main python installation.
 	
 In the console, type:
-
-`pip install virtualenv` -- installs virtualenv
-	
-`cd OBET` -- navigate to the appropriate directory with your project, whatever its name.
-
-`virtualenv venv` -- creates a virtual environment with the name you give it, in this case venv
+* `pip install virtualenv` -- installs virtualenv
+* `cd OBET` -- navigate to the appropriate directory with your project, whatever its name.
+* `virtualenv venv` -- creates a virtual environment with the name you give it, in this case venv
 
 Read more about [virtualenv] (http://docs.python-guide.org/en/latest/dev/virtualenvs/) if you are interested or having trouble.
 
@@ -105,9 +91,8 @@ Read more about [virtualenv] (http://docs.python-guide.org/en/latest/dev/virtual
 ##### Start your virtual environment and install the necessary dependencies.
 
 In the console, type:
-`source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
-	
-`pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
+* `source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
+* `pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
 
 ##### Get the environment variables set up. (More on this later.)
 
@@ -132,7 +117,6 @@ Open a browser and type "localhost:5000", and the site should come alive.
 
 ### Code Navigation Overview
 ======
-
 ###### Main Site Folder
 * The actual application is in the "app" folder.
 * Tests are inside "tests"
@@ -173,7 +157,6 @@ Open a browser and type "localhost:5000", and the site should come alive.
 
 ### Important Information
 ======
-
 * The back end uses [MongoDB] (https://www.mongodb.org/) for its database, using the [flask-mongoengine] (https://flask-mongoengine.readthedocs.org/en/latest/)/[MongoEngine] (https://mongoengine-odm.readthedocs.org/) libraries to connect to a [MongoLab] (https://mongolab.com/) account. These are important reads to help you understand the working of the database.
 
 * The front end uses a Python framework called [Flask] (http://flask.pocoo.org/docs/0.10/). Flask has numerous libraries, so the main site is not the best to get specific information. Instead, you should look up the specific libraries of Flask, which can be found in the requirements.txt file. The relevant lines will begin with Flask-libraryName.
@@ -207,7 +190,6 @@ Open a browser and type "localhost:5000", and the site should come alive.
 
 ### Resources
 ======
-
 * **The book _Flask Web Development_ by Miguel Grinberg is THE number 1 resource for detailed insight into the vast majority of this site! You should read as much as you can before starting development.**
 
 * For the information NOT included in the Flask book, Stackoverflow will be your best friend.
