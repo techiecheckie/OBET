@@ -3,20 +3,39 @@
 {% block title %}OBET - User Profile{% endblock %}
 {% block page_content %}
 <div class="page-header">
- <h1>{{ user.name }}</h1>
- <p>
- {% if user.name %}{{ user.name }}{% endif %}
- </p>
- <p>
- {% if user.credentials %}{{ user.credentials }}{% endif %}
- </p>
- {% if current_user.is_administrator() %}
- <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
- {% endif %}
- {% if user.description %}<p>{{ user.description }}</p>{% endif %}
+ 	<h1>{{ user.name }}</h1>
+ 
+ 	<p>
+ 		{% if user.credentials %}Credentials: {{ user.credentials }}{% endif %}
+ 	</p>
+ 
+ 	<p>
+ 		{% if user.location %}
+ 			Lives in: <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
+ 		{% endif %}
+ 	</p>
+ 
+ 	<p>
+ 		{% if current_user.is_administrator() %}
+ 			Email to: <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+ 		{% endif %}
+ 	</p>
+ 	
+ 	<p>
+ 		{% if user.description %}About Me: {{ user.description }}{% endif %}
+ 	</p>
+ 
+ 	<p>
+ 		Member since {{ moment(user.member_since).format('L') }}.
+ 	</p>
+ 	<p>
+ 		Last seen {{ moment(user.last_seen).fromNow() }}.
+ 	</p>
+ 
  {% if user == current_user %}
 	<a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile
 	</a>
 {% endif %}
+
 </div>
 {% endblock %}

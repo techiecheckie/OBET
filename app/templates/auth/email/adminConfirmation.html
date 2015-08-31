@@ -1,0 +1,36 @@
+<p>OBET Admin,</p>
+	<p>
+		A new user, {{ name }}, with email {{ email }}, would like to contribute to <b>OBET</b>.
+	</p>
+	<p>The user sends as reasoning:
+		<p><blockquote><i>"{{ reason }}"</i></blockquote></p>
+	</p>
+	<p>
+		If you would like to accept this user,
+		<a href="{{ url_for('auth.approveUser', email = email, _external=True) }}">click here</a>, or if you'd prefer, paste this link into your browser's address bar:
+	</p>
+	<p>
+		{{ url_for('auth.approveUser', email = email, _external=True) }}
+	</p>
+	<p>
+		To reject this user,
+		<a href="{{ url_for('auth.rejectUser', email = email, _external=True) }}">click this link instead</a>, or paste this link into your browser:
+	</p>
+	<p>
+		{{ url_for('auth.rejectUser', email = email, _external=True) }}
+	</p>
+	<p>
+		<b>
+			Do note that you will need to be logged into an administrative account to accept and reject users.
+		</b>
+	</p>
+	<br>
+	<br>
+	<p>Sincerely,</p>
+	<p>OBET Auto-Email Robot</p>
+	
+<p>
+	<small>
+		Note: replies to this email address are not monitored.
+	</small>
+</p>

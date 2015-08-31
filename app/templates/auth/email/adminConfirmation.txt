@@ -1,0 +1,19 @@
+OBET Admin,
+
+A new user, {{ name }}, with email {{ email }}, would like to contribute to OBET.
+
+The user sends as reasoning:
+{{ reason }}
+
+If you would like to accept this user, click the following link:
+{{ url_for('auth.approveUser', email = email, _external=True) }}
+
+
+To reject this user, click this link instead:
+{{ url_for('auth.rejectUser', email = email, _external=True) }}
+
+Sincerely,
+
+OBET Auto-Email Robot
+
+Note: replies to this email address are not monitored.

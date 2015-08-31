@@ -3,15 +3,23 @@
 {% block title %}OBET - Login{% endblock %}
 {% block page_content %}
 <div class="page-header">
- <h1>Login</h1>
+ 	<h1>Login</h1>
 </div>
 <div class="col-md-4">
- {{ wtf.quick_form(form) }}
- <p>
- New user?
- <a href="{{ url_for('auth.register') }}">
- Click here to register
- </a>
-</p>
+ 	{{ wtf.quick_form(form) }}
+ 	<br>
+ 	    <p>Forgot your password? 
+ 	    		<a href="{{ url_for('auth.password_reset_request') }}">Click here to reset it</a>.
+ 	    </p>
+
+ 	<p>
+ 		
+ 		Interested in contributing to OBET?
+ 		<a href="{{ url_for('auth.register') }}"> Click here to register</a>!
+ 		<br>
+ 		<small>Note: It is not necessary to register to search the database.</small>
+	</p>
 </div>
+	
+
 {% endblock %}

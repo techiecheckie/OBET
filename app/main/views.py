@@ -163,20 +163,8 @@ def edit_profile():
  	form.name.data = current_user.name
  	form.credentials.data = current_user.credentials
  	form.description.data = current_user.description
- 	return render_template('edit_profile.html', form=form)
+ 	return render_template('editProfile.html', form=form)
 
-#@main.route('/<name>/deactivateAcct')
-#@login_required
-#@user_required
-#deactivate
-#def deactivateAcct:
-#	form = DeactivateForm()
-# 	if form.validate_on_submit():
-#			current_user.activated = False			
-# 		return redirect(url_for('main.addLit'))
-# 	return render_template('addLit.html', name = current_user.name, form = form)
-#changeEmail
-#changePass
 
 
 #################################

@@ -7,9 +7,9 @@ class Config:
 	MAIL_USE_TLS = True
  	OBET_MAIL_SUBJECT_PREFIX = '[OBET]'
  	OBET_MAIL_SENDER = 'OBET Admin <obet.correspondence@gmail.com>'
-	OBET_ADMIN = os.environ.get('OBET_ADMIN')
-	MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
- 	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+	OBET_ADMIN = 'oddlypaired@gmail.com' #os.environ.get('OBET_ADMIN')
+	MAIL_USERNAME = 'obet.correspondence@gmail.com' #os.environ.get('MAIL_USERNAME')
+ 	MAIL_PASSWORD = 'OBETCorr' #os.environ.get('MAIL_PASSWORD')
 
 	@staticmethod
 	def init_app(app):
