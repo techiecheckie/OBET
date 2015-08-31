@@ -28,6 +28,7 @@ Open a terminal/console and type:
 `sudo apt-get install build-essential checkinstall`
 
 `sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
+
 This globally installs necessary dependencies.
 
 `sudo` makes the installation global, and may require a password from you.
@@ -43,31 +44,38 @@ and they can be easily found by looking up installation of Python.
 pip is a package installer for Python packages. It will make your life much easier.
 
 In the console, type:
-	`sudo apt-get install pip` -- installs pip globally
+
+`sudo apt-get install pip` -- installs pip globally
 	
 ##### Install git if you don't have it, make a github account, grab the code from the repo.
 Git is a command line version control system that allows you to keep track of your code.
 Github allows you to store your code elsewhere so it's never lost no matter what.
 
 In the console, type:
-	`sudo apt-get install git` -- installs git globally
-	`cd OBET` -- switches to a folder called OBET if it exists, otherwise makes one and switches there.
-	`git init` -- starts the folder as a git project
+
+`sudo apt-get install git` -- installs git globally
+
+`cd OBET` -- switches to a folder called OBET if it exists, otherwise makes one and switches there.
+
+`git init` -- starts the folder as a git project
 
 After making an account on github, go [here] (https://github.com/techiecheckie/OBET/) and [fork, then clone the project] (https://guides.github.com/activities/forking/).
 
 To connect to github from your computer, you will need to [generate and add an SSH key] (https://help.github.com/articles/generating-ssh-keys/) to be allowed to do so.
 
 Back in the console, type:
-	`git remote add upstream git@github.com:techiecheckie/OBET.git` -- this creates a connection to the repo
+
+`git remote add upstream git@github.com:techiecheckie/OBET.git` -- this creates a connection to the repo
 
 Finally, to pull the code from the repo into your folder, type in the console:
-	`git fetch upstream` -- this grabs the aforementioned connection
+
+`git fetch upstream` -- this grabs the aforementioned connection
 	
-	`git merge upstream/master` or `git pull upstream master` -- this merges and/or pulls the code from the repo
+`git merge upstream/master` or `git pull upstream master` -- this merges and/or pulls the code from the repo
 
 To use the repo and submit your changes later on, navigate to the appropriate folder in the command line.
 There are 3 steps to push your changes to the github repo.
+
 1. `git add changedFileName.ext` -- this tells git that you plan to commit this file. There are many files that you will not want to commit to the repo. ONLY commit .py files, .html files, .md files, image files associated with the site (jpg, ico, png, and so on), and any .txt files, if you add them. (In this case, it's adding a fake file called changedFileName.ext, you should replace that with what you w
 	* **DO NOT commit anything in the venv folder to the repo.**
 	* **DO NOT commit .py~, .pyc, .pyc~, or any other file ending in ~ to the repo.**
@@ -81,10 +89,12 @@ If interested, read up on [git] (https://git-scm.com/download/linux) and [github
 Virtualenv makes a virtual environment on your computer that will allow you to install certain python packages, but only within a specific folder. It essentially protects your main python installation.
 	
 In the console, type:
-	`pip install virtualenv` -- installs virtualenv
+
+`pip install virtualenv` -- installs virtualenv
 	
-	`cd OBET` -- navigate to the appropriate directory with your project, whatever its name.
-	`virtualenv venv` -- creates a virtual environment with the name you give it, in this case venv
+`cd OBET` -- navigate to the appropriate directory with your project, whatever its name.
+
+`virtualenv venv` -- creates a virtual environment with the name you give it, in this case venv
 
 Read more about [virtualenv] (http://docs.python-guide.org/en/latest/dev/virtualenvs/) if you are interested or having trouble.
 
@@ -95,15 +105,16 @@ Read more about [virtualenv] (http://docs.python-guide.org/en/latest/dev/virtual
 ##### Start your virtual environment and install the necessary dependencies.
 
 In the console, type:
-	`source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
+`source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
 	
-	`pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
+`pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
 
 ##### Get the environment variables set up. (More on this later.)
 
 ##### Run the application if all has worked out!
 
 In the console, navigate to the root folder of the project and type:
+
 `python manage.py runserver -dr` -- this starts the app and the server. The -dr parameters that allow 2 different things.
 * -r will instantly reload the server whenever you make a change to a .py file, so you don't have to keep running this command when you make changes.
 * -d runs the server in debug mode so that you will get full traceback of errors in the browser when something goes awry.
