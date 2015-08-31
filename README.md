@@ -25,16 +25,16 @@ Before beginning, the computer should be prepared with python and a python insta
 * Ubuntu 14.04 comes with Python 3.4 installed
 	
 Open a terminal/console and type:
-	`sudo apt-get install build-essential checkinstall`
+`sudo apt-get install build-essential checkinstall`
 
-	`sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
+`sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev`
 This globally installs necessary dependencies.
 
-	`sudo` makes the installation global, and may require a password from you.
+`sudo` makes the installation global, and may require a password from you.
 	
-	`apt-get` grabs the applications you want to install.
+`apt-get` grabs the applications you want to install.
 	
-	`install` is self-explanatory and following that are the list of items you want to install, separated by a space.
+`install` is self-explanatory and following that are the list of items you want to install, separated by a space.
 
 There are a ton of different ways to install Python, particularly if you want Python 2.7,
 and they can be easily found by looking up installation of Python.
