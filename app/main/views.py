@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, session, redirect, url_for, flash
 from . import main
-from .forms import NameForm, SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
+from .forms import SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit
 from flask.ext.login import login_required, current_user
@@ -11,23 +11,7 @@ from flask.ext.login import login_required, current_user
 #######################
 @main.route('/', methods=['GET', 'POST'])
 def index():
- form = NameForm()
- if form.validate_on_submit():
- 	user = User.objects(name__iexact = form.name.data).first()
- 	if user is None:
- 		flash("You don't seem to be in the database!")
- 		newUser = User(name = form.name.data, email=(form.name.data+'@OBET.com'), hashPass = (form.name.data+'Password')).save()
- 		flash("No worries, you've been added!")
- 		session['known'] = False
- 		if app.config['OBET_ADMIN']:
- 			send_email(app.config['OBET_ADMIN'], 'New User', 'mail/new_user', user = user)
- 	else:
- 		flash('Welcome back, ' + user.name + '! Great to see you again! ')
- 	session['known'] = True
- 	session['name'] = form.name.data
- 	form.name.data = ''
- 	return redirect(url_for('index'))
- return render_template('index.html', form = form, name = session.get('name'), known=session.get('known', False), current_time=datetime.utcnow())
+ 	return render_template('index.html', current_time = datetime.utcnow())
 
 
 #########################

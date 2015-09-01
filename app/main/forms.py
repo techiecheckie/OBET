@@ -6,10 +6,6 @@ from wtforms import ValidationError
 from ..models import User, Lit, Role
 from wtforms.fields.html5 import EmailField
 
-class NameForm(Form):
-	name = StringField('What is your name?', validators = [Required()])
-	submit = SubmitField('Submit')
-
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
     	submit = SubmitField('Search')
