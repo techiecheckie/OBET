@@ -94,7 +94,9 @@ In the console, type:
 * `source venv/bin/activate` -- activates your virtual environment. You should notice (venv) appear before your command prompt, that's the sign you're doing it correctly.
 * `pip install -r requirements.txt` -- installs requirements needed to run the project within your environment
 
-##### Get the environment variables set up. (More on this later.)
+##### Create a .env file in the root folder of the application.
+
+This is where all of the configuration information will be stored locally, so that they remain secret but can easily be added to any build as long as this file is in the root. Check the .env-example for an idea on what your file should be similar to, though obviously with real credentials.
 
 ##### Run the application if all has worked out!
 
