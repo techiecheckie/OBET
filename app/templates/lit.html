@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}OBET - Literature Profile{% endblock %}
+{% block page_content %}
+<div class="page-header">
+ <h1>{{ lit.title }}</h1>
+ <p>
+ {% if lit.refType %}{{ lit.refType }}{% endif %}
+ </p>
+  <p>
+ {% if lit.title %}{{ lit.title }}{% endif %}
+ </p>
+  <p>
+ {% if lit.author %}{{ lit.author }}{% endif %}
+ </p>
+  <p>
+ {% if lit.description %}{{ lit.description }}{% endif %}
+ </p>
+ <p>
+ {% if lit.edition %}{{ lit.edition }}{% endif %}
+ </p>
+ <p>
+ {% if lit.yrPublished %}{{ lit.yrPublished }}{% endif %}
+ </p>
+ <p>
+ {% if lit.tags %}
+ 	<ul>
+ 		{% for t in tags %}
+ 			<li>{{ lit.t }}</li>
+ 		{% endfor %}
+ 	</ul>
+ {% endif %}
+ </p>
+
+ {% if current_user.is_administrator() %}
+ <p>
+ <a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}"><button type="button">Delete</button></a>
+ </p>
+  {% endif %}
+</div>
+{% endblock %}

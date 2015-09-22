@@ -1,0 +1,23 @@
+<p>Dear {{ user.name }},</p>
+	<p>
+		Unfortunately, the administrator has decided not to add you as a user to <b>OBET</b> at this time.
+		You may of course continue to use the site to look for literature that interests you!
+	</p>
+	<p>The admin sends as reasoning:
+		<p><blockquote><i>"{{ reason }}"</i></blockquote></p>
+	</p>
+	<p>You may email the admin who made the decision directly to inquire why.
+		<p><b>Name:</b> {{ admin.name }}</p>
+		<p><b>Email:</b> <a href="mailto:{{ admin.email }}">{{ admin.email }}</a></p>
+	</p>
+	<p>
+		Thank you for your interest in OBET!
+	</p>
+	<p>Sincerely,</p>
+	<p>OBET Auto-Email Robot</p>
+	
+<p>
+	<small>
+		Note: replies to this email address are not monitored.
+	</small>
+</p>

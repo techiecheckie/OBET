@@ -1,0 +1,19 @@
+Dear {{ user.name }},
+
+Unfortunately, the administrator has decided not to add you as a user to <b>OBET</b> at this time.
+You may of course continue to use the site to look for literature that interests you!
+
+The admin sends as reasoning: {{ reason }}
+
+You may email the admin who made the decision directly to inquire why:
+Name: {{ admin.name }}
+Email: {{ admin.email }}
+
+Thank you for your interest in OBET!
+
+Sincerely,
+OBET Auto-Email Robot
+	
+
+Note: replies to this email address are not monitored.
+

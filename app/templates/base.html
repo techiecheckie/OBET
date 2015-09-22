@@ -1,0 +1,82 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}OBET{% endblock %}
+
+{% block navbar %}
+<div style = "margin-bottom: 60px">
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">OBET</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="{{ url_for('main.search') }}">Search</a></li>
+                {% if current_user.is_authenticated() %}
+                <li><a href="{{ url_for('main.user', email = current_user.email) }}">Profile</a></li>
+                {% endif %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.can(Permission.ADDLIT) or current_user.can(Permission.ADMINISTER) %}
+                <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Lit</a></li>
+                	{% if current_user.can(Permission.ADMINISTER) %}
+                	<li><a href="{{ url_for('main.deleteLit', name = current_user.name) }}">Delete Lit</a></li>
+                	<li><a href="{{ url_for('main.deleteUser', name = current_user.name) }}">Delete User</a></li>
+                	{% endif %}
+                {% endif %}
+
+                {% if current_user.is_authenticated() %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
+                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+
+</div>
+<footer class = "footer" style = "position: absolute; bottom: 0; width: 100%; height: 60px; background-color: #f5f5f5;">
+    <div class = "container" style = "padding-right: 15px; padding-left: 15px;">
+    	  <p class = "text-muted" style = "margin: 20px 0; font-size: 120%;">
+    		Site created by NH. Find me at <a href="https://www.linkedin.com/in/techiecheckie">LinkedIn</a> and <a href="https://github.com/techiecheckie/">GitHub</a>. 
+    		{% if current_time %}<small>Accessed this site at {{ current_time }}.</small>{% endif %}
+    	</p>
+    	
+   </div>
+</footer>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{% endblock %}

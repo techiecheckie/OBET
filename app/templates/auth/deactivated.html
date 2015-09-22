@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Flasky - Account Deactivated{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        Hello, {{ current_user.name }}!
+    </h1>
+    <h3>Your account is deactivated.</h3>
+    <p>
+        You must reactivate your account to continue.
+    </p>
+    <p>
+        <a href="{{ url_for('auth.activate') }}">Click here to reactivate</a>
+    </p>
+</div>
+{% endblock %}
