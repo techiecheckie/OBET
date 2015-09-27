@@ -1,1 +1,1 @@
-web: gunicorn obet.wsgi
+web: gunicorn manage:app
