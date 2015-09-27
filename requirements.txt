@@ -1,4 +1,4 @@
-alabaster==0.7.6
+gunicorn==19.3.0alabaster==0.7.6
 Babel==2.0
 blinker==1.4
 click==5.1
