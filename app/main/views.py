@@ -123,7 +123,7 @@ def addLit():
  			flash("This is already in the DB.")
  			## Change addLit to updateLit.
 			return render_template('addLit.html', form = form)
-		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data)
+		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data)
 		lit.save()
 		flash("Successfully added!")				
  		return redirect(url_for('main.addLit'))

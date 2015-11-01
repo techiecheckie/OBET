@@ -3,26 +3,33 @@
 {% block title %}OBET - Literature Profile{% endblock %}
 {% block page_content %}
 <div class="page-header">
- <h1>{{ lit.title }}</h1>
+ <h1>Title: {{ lit.title }}</h1>
  <p>
- {% if lit.refType %}{{ lit.refType }}{% endif %}
+ {% if lit.refType %}Reference Type: {{ lit.refType }}{% endif %}
  </p>
   <p>
- {% if lit.title %}{{ lit.title }}{% endif %}
+ {% if lit.primaryField %}Primary Field: {{ lit.primaryField }}{% endif %}
  </p>
   <p>
- {% if lit.author %}{{ lit.author }}{% endif %}
+ {% if lit.secondaryField %}Secondary Field: {{ lit.secondaryField }}{% endif %}
  </p>
   <p>
- {% if lit.description %}{{ lit.description }}{% endif %}
+ Title: {% if lit.title %}{{ lit.title }}{% endif %}
+ </p>
+  <p>
+ {% if lit.author %}Author: {{ lit.author }}{% endif %}
+ </p>
+  <p>
+ {% if lit.description %} Description: {{ lit.description }}{% endif %}
  </p>
  <p>
- {% if lit.edition %}{{ lit.edition }}{% endif %}
+ {% if lit.edition %}Edition: {{ lit.edition }}{% endif %}
  </p>
  <p>
- {% if lit.yrPublished %}{{ lit.yrPublished }}{% endif %}
+ {% if lit.yrPublished %} Year published: {{ lit.yrPublished }}{% endif %}
  </p>
  <p>
+ Tags: 
  {% if lit.tags %}
  	<ul>
  		{% for t in tags %}
