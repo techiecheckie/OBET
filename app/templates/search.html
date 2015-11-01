@@ -2,30 +2,42 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}OBET - Search For Literature{% endblock %}
 {% block page_content %}
+<head>
+
+</head> 
+
 <div class="page-header">
  <h1>Search For Literature</h1>	
 </div>
 
+{% set category = "title" %}
+<meta id="category" data-name="{{category}}">
+<meta id="searchString" data-name="{{searchString}}">
+{% if searchTerm %}
+  {% set searchString = searchTerm %}
+{% endif %}
 
 <div class="container">
   <h2>Results</h2>
   <p>References that match your search query:</p>   
-      
 <table class="table" >  
     <thead>
       <tr>
-		<th data-sortable="true">Title</th>
-      	<th data-sortable="true">Type</th>
-      	<th data-sortable="true">Author</th>
-      	<th data-sortable="true">Description</th>
+		    <th >Title </th>
+      	<th >Type </th>
+      	<th >Author </th>
+        <th >Primary Field </th>
+      	<th >Description</th>
       </tr>
  	</thread> 	
     <tbody>
-  	{% for l in lit %} 
+  	{% for l in lit | sort(attribute=category)%} 
+
     	<tr>
     		<td><a href="{{ url_for('main.lit', title = l.title) }}">{{l.title}}</a></td> 
     		<td>{{l.refType}}</td>
     		<td>{{l.author}}</td>
+        <td>{{l.primaryField}}</td>
     		<td>{{l.description}}</td>
     	</tr>
     {% endfor %}
