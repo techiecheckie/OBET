@@ -35,12 +35,12 @@ class User(UserMixin, db.Document):
     	member_since = db.DateTimeField(default = datetime.datetime.utcnow)
  	last_seen = db.DateTimeField(default = datetime.datetime.utcnow)
  	u_edit_record = db.ListField(db.EmbeddedDocumentField(UserEditRecord), default = [])
-    	meta = {'indexes': [
-    		{'fields': ['$email', '$name'],
-    		 'default_language': 'english',
-    		 'weight': {'email': 100, 'name': 50}
-    		}
-    	]}
+    	# meta = {'indexes': [
+    	# 	{'fields': ['$email', '$name'],
+    	# 	 'default_language': 'english',
+    	# 	 'weight': {'email': 100, 'name': 50}
+    	# 	}
+    	# ]}
      
         		
     	def __repr__(self):
@@ -185,11 +185,24 @@ class AnonymousUser(AnonymousUserMixin):
  	def is_administrator(self):
  		return False
 
+REFTYPES = ('Book Section', 'Edited Book', 'Journal Article', 'Journal Issue', 'Magazine Article', 'Media',
+    'Newspaper Article', 'Report', 'Thesis', 'Website' )
+
+FIELDS = (('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'),
+            ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'),
+            ('History/Politics/Law','History/Politics/Law'),
+            ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'),
+            ('Animal Science/Welfare','Animal Science/Welfare'),
+            ('Ecology/Conservation','Ecology/Conservation'),
+            ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'),
+            ('Education/Living','Education/Living'))
 
 class Lit(db.Document):
-    	refType = db.StringField(max_length = 30, required = True)
+    	refType = db.StringField(max_length = 30, required=True, choices=REFTYPES)
+        primaryField = db.StringField(required=True, choices=FIELDS)
+        secondaryField = db.StringField(choices=FIELDS)
     	title = db.StringField(max_length = 120, required = True, unique = True)
-    	author = db.StringField(max_length = 30, required = True, unique_with = ['title'])
+    	author = db.StringField(max_length = 30, unique_with = ['title'])
     	description = db.StringField(max_length = 500, required = True)
     	edition = db.IntField(default = None)
     	pages = db.StringField(default = None)
@@ -197,13 +210,15 @@ class Lit(db.Document):
     	tags = db.ListField(StringField(max_length = 30), default = [])
     	link = db.URLField(max_length = 200, default = None)
     	l_edit_record = db.ListField(db.EmbeddedDocumentField(LitEditRecord), default = [])
-    	meta = {'indexes': [
-    		{'fields': ['$title', '$author', "$description"],
-    		 'default_language': 'english',
-    		 'weight': {'title': 100, 'author': 50, 'description': 10}
-    		}
-    	]}
-    	
+    	# meta = {
+     #        'indexes': [
+    	# 	  {
+     #          'fields': ['$title', '$author', "$description"],
+    	# 	  'default_language': 'english',
+    	# 	  'weight': {'title': 100, 'author': 50, 'description': 10}
+    	# 	  }
+    	# ]}
+           
 
     	def __repr__(self):
  		return '<Lit %s, %s>' % (self.title, self.author)
