@@ -110,7 +110,7 @@ def lit(title):
 @main.route('/addLit', methods=['GET', 'POST'])
 @login_required
 def addLit():
-	isUpdate = False
+	# isUpdate = False
  	form = AddLitForm()
  	if form.validate_on_submit():
 		#########################################################
@@ -122,7 +122,7 @@ def addLit():
 		if lit is not None:
  			flash("This is already in the DB.")
  			## Change addLit to updateLit.
-			return render_template('addLit.html', form = form)
+			return render_template('update.html', form = form, lit = lit)
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data)
 		lit.save()
 		flash("Successfully added!")				
@@ -143,6 +143,17 @@ def updateLit(lit_id):
 	form.description.data = lit.description
 	form.primaryField.data = lit.primaryField
 	form.secondaryField.data = lit.secondaryField
+	return render_template('update.html', form = form, lit = lit)
+
+#################
+# submit Update #
+#################
+@main.route('/updateLitSub/<lit_id>', methods=['POST'])
+@login_required
+def updateLitSub(lit_id):
+	form = AddLitForm()
+	lit = Lit.objects(id__iexact = lit_id).first()
+	print "From update lit sub"
 	if form.validate_on_submit():
 		lit.update(set__title=form.title.data)
 		lit.update(set__refType=form.refType.data)
@@ -150,8 +161,9 @@ def updateLit(lit_id):
 		lit.update(set__description=form.description.data)
 		lit.update(set__primaryField=form.primaryField.data)
 		lit.update(set__secondaryField=form.secondaryField.data)
-		return render_template('lit.html', lit = lit)
-	return render_template('update.html', form = form, lit = lit)
+	lit = Lit.objects(id__iexact = lit_id).first()
+	flash(lit.title + " has been updated")
+	return render_template('lit.html', lit = lit)
 
 ################
 # Edit Profile #

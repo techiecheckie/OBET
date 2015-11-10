@@ -8,7 +8,7 @@
 
 <div class="col-md-4">
 
- {{ wtf.quick_form(form) }}
+ {{ wtf.quick_form(form, action=url_for('main.updateLitSub', lit_id = lit.id)) }}
 <p></p><br><br>
 </div>
 {% endblock %}
