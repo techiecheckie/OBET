@@ -25,12 +25,12 @@ class AddLitForm(Form):
     title = StringField('Title', validators = [Required(), Length(1,150)])
     author = StringField('Author', validators = [Length(1,120)])
     description = TextAreaField('Description', validators = [ Length(1,1000)])
-	#edition = IntegerField('Edition') 
-	#pages = StringField('Pages', validators = [Length(1,10)])
-	#yrPublished = IntegerField('Year Published', validators = [NumberRange(min=1800)]) # MUST ADD max_value!!! Limit it to THIS year!!
-	#tags = FieldList(StringField('Tags'))
-	#link = FieldList(StringField('Links'))
-    submit = SubmitField('Add')
+	# edition = IntegerField('Edition') 
+	# pages = StringField('Pages', validators = [Length(1,10)])
+	# yrPublished = IntegerField('Year Published', validators = [NumberRange(min=1800)]) # MUST ADD max_value!!! Limit it to THIS year!!
+	# tags = FieldList(StringField('Tags'))
+	# link = FieldList(StringField('Links'))
+    submit = SubmitField('Submit')   
     	
 class DeleteUserForm(Form):
 	email = EmailField("Email", validators=[Required()])
