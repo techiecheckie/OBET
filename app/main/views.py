@@ -129,6 +129,29 @@ def addLit():
  		return redirect(url_for('main.addLit'))
  	return render_template('addLit.html', form = form)
 
+##############
+# Update Lit #
+##############
+@main.route('/updateLit/<lit_id>', methods=['GET','POST'])
+@login_required
+def updateLit(lit_id):
+	lit = Lit.objects(id__iexact = lit_id).first()
+	form = AddLitForm()
+	form.refType.data = lit.refType
+	form.title.data = lit.title
+	form.author.data = lit.author
+	form.description.data = lit.description
+	form.primaryField.data = lit.primaryField
+	form.secondaryField.data = lit.secondaryField
+	if form.validate_on_submit():
+		lit.update(set__title=form.title.data)
+		lit.update(set__refType=form.refType.data)
+		lit.update(set__author=form.author.data)
+		lit.update(set__description=form.description.data)
+		lit.update(set__primaryField=form.primaryField.data)
+		lit.update(set__secondaryField=form.secondaryField.data)
+		return render_template('lit.html', lit = lit)
+	return render_template('update.html', form = form, lit = lit)
 
 ################
 # Edit Profile #
@@ -148,8 +171,6 @@ def edit_profile():
  	form.credentials.data = current_user.credentials
  	form.description.data = current_user.description
  	return render_template('editProfile.html', form=form)
-
-
 
 #################################
 # Delete Lit Main Page Function #

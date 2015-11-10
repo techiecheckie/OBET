@@ -43,6 +43,9 @@
  <p>
  <a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}"><button type="button">Delete</button></a>
  </p>
+ <p>
+ <a href="{{ url_for('main.updateLit', lit_id = lit.id) }}"><button type="button">Update</button></a>
+ </p>
   {% endif %}
 </div>
 {% endblock %}

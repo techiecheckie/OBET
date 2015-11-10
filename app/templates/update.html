@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}OBET - Update Literature{% endblock %}
+{% block page_content %}
+<div class="page-header">
+ <h1>Update Literature</h1>	
+</div>
+
+<div class="col-md-4">
+
+ {{ wtf.quick_form(form) }}
+<p></p><br><br>
+</div>
+{% endblock %}
