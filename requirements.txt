@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 gunicorn==19.3.0
-=======
->>>>>>> 6dc6b638d7ca46d364386662a46d51d55078dfa9
 alabaster==0.7.6
 Babel==2.0
 blinker==1.4
