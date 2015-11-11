@@ -44,7 +44,7 @@ def register():
 		if form.email.data == current_app.config['OBET_ADMIN']:
 			flash('Welcome to OBET, new Admin! Please log in to continue.')
 			return redirect(url_for('auth.login'))
- 		send_email('oddlypaired@gmail.com', 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
+ 		send_email('jaying.wu25@qmail.cuny.edu', 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
  		flash('The admin must approve your registration before you will be able to register. Check your email soon.')
  		
  		
@@ -164,7 +164,7 @@ from ..email import send_email
 @login_required
 def resend_confirmation():
  	token = current_user.generate_confirmation_token()
- 	send_email('auth/email/confirm', 'Confirm Your Account', user = current_user, token=token)
+ 	send_email(current_user.email, 'Confirm Your Account', 'auth/email/confirm', user = current_user, token=token)
  	flash('A new confirmation email has been sent to you by email.')
  	return redirect(url_for('main.index'))
  	

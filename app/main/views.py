@@ -3,7 +3,7 @@ from flask import render_template, session, redirect, url_for, flash
 from . import main
 from .forms import SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
-from ..models import User, Role, Lit
+from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from flask.ext.login import login_required, current_user
 
 #######################
@@ -88,7 +88,10 @@ def user(email):
 	user = User.objects(email__iexact = email).first()
 	if user is None:
 		abort(404)
-	return render_template('user.html', user = user)
+	latest_activity = current_user.u_edit_record
+	latest_activity = sorted(latest_activity, key=lambda la: la.date, reverse=True)
+	latest_activity = latest_activity[0:5]
+	return render_template('user.html', user = user, latest_activity = latest_activity)
 
 
 #################
@@ -123,20 +126,30 @@ def addLit():
  			flash("This is already in the DB.")
  			## Change addLit to updateLit.
 			return render_template('update.html', form = form, lit = lit)
+		editHist = LitEditRecord(lastUserEdited = current_user.name)
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data)
 		lit.save()
+		lit.update(push__l_edit_record=editHist)
+		lit.update(set__last_edit = editHist)
+		lit.reload()
+		userHist = UserEditRecord(litEdited = str(lit.id), operation = "add", litEditedTitle = lit.title)
+		current_user.update(push__u_edit_record=userHist)
+		current_user.reload()
+		print editHist.lastUserEdited
 		flash("Successfully added!")				
- 		return redirect(url_for('main.addLit'))
+ 		return redirect(url_for('main.lit', title = lit.title))
  	return render_template('addLit.html', form = form)
 
 ##############
 # Update Lit #
 ##############
+
 @main.route('/updateLit/<lit_id>', methods=['GET','POST'])
 @login_required
 def updateLit(lit_id):
 	lit = Lit.objects(id__iexact = lit_id).first()
 	form = AddLitForm()
+	# Prepopulate the field with literature object information
 	form.refType.data = lit.refType
 	form.title.data = lit.title
 	form.author.data = lit.author
@@ -148,12 +161,12 @@ def updateLit(lit_id):
 #################
 # submit Update #
 #################
+
 @main.route('/updateLitSub/<lit_id>', methods=['POST'])
 @login_required
 def updateLitSub(lit_id):
 	form = AddLitForm()
 	lit = Lit.objects(id__iexact = lit_id).first()
-	print "From update lit sub"
 	if form.validate_on_submit():
 		lit.update(set__title=form.title.data)
 		lit.update(set__refType=form.refType.data)
@@ -161,6 +174,13 @@ def updateLitSub(lit_id):
 		lit.update(set__description=form.description.data)
 		lit.update(set__primaryField=form.primaryField.data)
 		lit.update(set__secondaryField=form.secondaryField.data)
+	editHist = LitEditRecord(lastUserEdited = current_user.name)
+	lit.update(push__l_edit_record=editHist)
+	lit.update(set__last_edit = editHist)
+	lit.reload()
+	userHist = UserEditRecord(litEdited = str(lit.id), operation = "update", litEditedTitle = lit.title)
+	current_user.update(push__u_edit_record=userHist)
+	current_user.reload()
 	lit = Lit.objects(id__iexact = lit_id).first()
 	flash(lit.title + " has been updated")
 	return render_template('lit.html', lit = lit)
@@ -188,7 +208,6 @@ def edit_profile():
 # Delete Lit Main Page Function #
 #################################
 
-
 from ..decorators import admin_required, permission_required, user_required
 @main.route('/deleteLit', methods=['GET', 'POST'])
 @login_required
@@ -201,7 +220,7 @@ def deleteLit():
 		if len(lit) == 0:
  			flash("Your search returned nothing. Try other search terms.")
  		else:
- 			return render_template('deleteLit.html', form = form, lit = lit)
+ 			return render_template('deleteLit.html', form = form, lit = lit, litEditedTitle = lit.title)
  		return redirect(url_for('main.deleteLit'))
  	return render_template('deleteLit.html', form = form)
 
@@ -214,10 +233,13 @@ def deleteLit():
 @login_required
 @admin_required
 def deleteLiterature(lit_id):
-	lit = Lit.objects( id__exact = lit_id)
+	lit = Lit.objects( id__exact = lit_id).first()
 	if lit is None:
 		flash("No literature like this in the database.")
 	else:
+		userHist = UserEditRecord(litEdited = str(lit_id), litEditedTitle = lit.title, operation = "delete")
+		current_user.update(push__u_edit_record=userHist)
+		current_user.reload()
 		lit.delete()
 		flash("Literature has been deleted!")				
 	return redirect(url_for('main.search'))

@@ -13,12 +13,20 @@ from flask import current_app
 from . import db
 
 class UserEditRecord(db.EmbeddedDocument):
-    litEdited = db.ReferenceField('Lit')
+    litEdited = db.StringField(required = True)
+    litEditedTitle = db.StringField(required = True)
     date = db.DateTimeField(default = datetime.datetime.utcnow, required = True)
+    operation = db.StringField(max_length = 30)
+
+    def __repr__(self):
+        return '<UserEditRecord %s, %s>' % (self.litEdited, self.date)
     
 class LitEditRecord(db.EmbeddedDocument):
-	lastUserEdited = db.ReferenceField('User')
+	lastUserEdited = db.StringField(max_length = 30, required = True)
 	date = db.DateTimeField(default = datetime.datetime.utcnow, required = True)
+
+        def __repr__(self):
+            return '<ListEditRecord %s, %s>' % (self.lastUserEdited, self.date)
 
 class User(UserMixin, db.Document):
     	name = db.StringField(max_length = 30, required = True, unique = True)
@@ -210,6 +218,7 @@ class Lit(db.Document):
     	tags = db.ListField(StringField(max_length = 30), default = [])
     	link = db.URLField(max_length = 200, default = None)
     	l_edit_record = db.ListField(db.EmbeddedDocumentField(LitEditRecord), default = [])
+        last_edit = db.EmbeddedDocumentField(LitEditRecord)
     	# meta = {
      #        'indexes': [
     	# 	  {
@@ -218,7 +227,6 @@ class Lit(db.Document):
     	# 	  'weight': {'title': 100, 'author': 50, 'description': 10}
     	# 	  }
     	# ]}
-           
 
     	def __repr__(self):
  		return '<Lit %s, %s>' % (self.title, self.author)

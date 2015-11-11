@@ -28,6 +28,15 @@
  <p>
  {% if lit.yrPublished %} Year published: {{ lit.yrPublished }}{% endif %}
  </p>
+ <p>Last Updated by: 
+ 	 {% if lit.last_edit %} 
+ 	 	{{ lit.last_edit.lastUserEdited }}
+ 	 	<br> 
+ 	 	&nbsp;&nbsp;on date: {{ lit.last_edit.date }} 
+ 	 {% else %}
+ 	 None
+ 	 {% endif %}
+ </p>
  <p>
  Tags: 
  {% if lit.tags %}
@@ -36,6 +45,8 @@
  			<li>{{ lit.t }}</li>
  		{% endfor %}
  	</ul>
+ 	{% else %}
+ 	 None
  {% endif %}
  </p>
 
