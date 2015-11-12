@@ -127,7 +127,7 @@ def addLit():
  			## Change addLit to updateLit.
 			return render_template('update.html', form = form, lit = lit)
 		editHist = LitEditRecord(lastUserEdited = current_user.name)
-		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data)
+		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data, creator = current_user.name)
 		lit.save()
 		lit.update(push__l_edit_record=editHist)
 		lit.update(set__last_edit = editHist)

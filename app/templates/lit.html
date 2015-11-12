@@ -28,6 +28,9 @@
  <p>
  {% if lit.yrPublished %} Year published: {{ lit.yrPublished }}{% endif %}
  </p>
+ <p>
+ Creator: {{ lit.creator }} 
+ </p>
  <p>Last Updated by: 
  	 {% if lit.last_edit %} 
  	 	{{ lit.last_edit.lastUserEdited }}

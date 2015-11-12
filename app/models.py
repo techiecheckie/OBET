@@ -219,6 +219,7 @@ class Lit(db.Document):
     	link = db.URLField(max_length = 200, default = None)
     	l_edit_record = db.ListField(db.EmbeddedDocumentField(LitEditRecord), default = [])
         last_edit = db.EmbeddedDocumentField(LitEditRecord)
+        creator = db.StringField(max_length = 30, required = True)
     	# meta = {
      #        'indexes': [
     	# 	  {
