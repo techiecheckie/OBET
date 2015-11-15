@@ -29,6 +29,12 @@ def search():
  			flash("Your search returned nothing. Try other search terms.")
  	else:
  		sortStr = str(form.sort.data)
+ 		# if sortStr == 'last_editdate' or sortStr == 'last_edituser':
+ 		# 	print 'trying to sort by embedded doc'
+ 		# 	lit = sorted(lit, key=lambda lit: getattr(getattr(lit, 'last_edit'), 'date'))
+ 		# 	# lit = sorted(lit, key=lambda lit: getattr(lit,'l_edit_record'))
+
+ 		# else:
  		lit = sorted(lit, key=lambda lit: getattr(lit, sortStr))
  		return render_template('search.html', form = form, lit = lit)
  	return redirect(url_for('main.search'))
@@ -137,7 +143,9 @@ def addLit():
  			flash("This is already in the DB.")
  			## Change addLit to updateLit.
 			return render_template('update.html', form = form, lit = lit)
+		
 		editHist = LitEditRecord(lastUserEdited = current_user.name)
+
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data, creator = current_user.name)
 		lit.save()
 		

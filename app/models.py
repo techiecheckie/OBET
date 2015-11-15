@@ -42,7 +42,7 @@ class User(UserMixin, db.Document):
     	role = db.ReferenceField('Role')
     	member_since = db.DateTimeField(default = datetime.datetime.now)
  	last_seen = db.DateTimeField(default = datetime.datetime.now)
- 	u_edit_record = db.ListField(db.EmbeddedDocumentField(UserEditRecord), default = [])
+ 	u_edit_record = db.SortedListField(db.EmbeddedDocumentField(UserEditRecord), ordering="date", reverse=True, default = [])
     	# meta = {'indexes': [
     	# 	{'fields': ['$email', '$name'],
     	# 	 'default_language': 'english',
@@ -217,9 +217,10 @@ class Lit(db.Document):
     	yrPublished = db.IntField(min_value = 1800, default = None) # MUST ADD max_value!!! Limit it to THIS year!!
     	tags = db.ListField(StringField(max_length = 30), default = [])
     	link = db.URLField(max_length = 200, default = None)
-    	l_edit_record = db.ListField(db.EmbeddedDocumentField(LitEditRecord), default = [])
+    	l_edit_record = db.SortedListField(db.EmbeddedDocumentField(LitEditRecord), default = [], ordering="date", reverse=True)
         last_edit = db.EmbeddedDocumentField(LitEditRecord)
         creator = db.StringField(max_length = 30, required = True)
+        created_date = db.DateTimeField(default = datetime.datetime.now, required = True)
     	# meta = {
      #        'indexes': [
     	# 	  {

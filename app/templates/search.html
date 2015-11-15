@@ -24,12 +24,15 @@
 <table class="table" >  
     <thead>
       <tr>
-		    <th >Title </th>
-      	<th >Type </th>
-      	<th >Author </th>
-        <th >Primary Field </th>
-      	<th >Description</th>
-        <th >Creator </th>
+		    <th> Title </th>
+      	<th> Type </th>
+      	<th> Author </th>
+        <th> Primary Field </th>
+      	<th> Description</th>
+        <th> Creator </th>
+        <th> Date Created </th>
+        <th> Last Modified </th>
+        <th> Last Modified By </th>
       </tr>
  	</thread> 	
     <tbody>
@@ -42,7 +45,10 @@
     		<td>{{l.author}}</td>
         <td>{{l.primaryField}}</td>
     		<td>{{l.description}}</td>
-        <td>{{l.creator}}
+        <td>{{l.creator}}</td>
+        <td>{{l.created_date}}</td>
+        <td>{{l.last_edit.date}}</td>
+        <td>{{l.last_edit.lastUserEdited}}</td>
     	</tr>
     {% endfor %}
     </tbody>

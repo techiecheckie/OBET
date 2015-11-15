@@ -8,7 +8,8 @@ from wtforms.fields.html5 import EmailField
 
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
-        sort = SelectField('Sort by: ', choices = [('title', 'Title'), ('author', 'Author'), ('refType', 'Type'), ('primaryField', 'Primary Field')])
+        sort = SelectField('Sort by: ', choices = [('author', 'Author/Editor'), ('created_date', 'Date Created'), ('creator', 'Creator'), ('primaryField', 'Primary Field'), ('title', 'Title')])
+        # add reverse option
         submit = SubmitField('Search')
     	
 class ExactSearchForm(Form):
