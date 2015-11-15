@@ -15,7 +15,7 @@ from . import db
 class UserEditRecord(db.EmbeddedDocument):
     litEdited = db.StringField(required = True)
     litEditedTitle = db.StringField(required = True)
-    date = db.DateTimeField(default = datetime.datetime.utcnow, required = True)
+    date = db.DateTimeField(default = datetime.datetime.now, required = True)
     operation = db.StringField(max_length = 30)
 
     def __repr__(self):
@@ -23,7 +23,7 @@ class UserEditRecord(db.EmbeddedDocument):
     
 class LitEditRecord(db.EmbeddedDocument):
 	lastUserEdited = db.StringField(max_length = 30, required = True)
-	date = db.DateTimeField(default = datetime.datetime.utcnow, required = True)
+	date = db.DateTimeField(default = datetime.datetime.now, required = True)
 
         def __repr__(self):
             return '<ListEditRecord %s, %s>' % (self.lastUserEdited, self.date)
@@ -40,8 +40,8 @@ class User(UserMixin, db.Document):
     	activated = db.BooleanField(default = True)
     	approved = db.BooleanField(default = False)
     	role = db.ReferenceField('Role')
-    	member_since = db.DateTimeField(default = datetime.datetime.utcnow)
- 	last_seen = db.DateTimeField(default = datetime.datetime.utcnow)
+    	member_since = db.DateTimeField(default = datetime.datetime.now)
+ 	last_seen = db.DateTimeField(default = datetime.datetime.now)
  	u_edit_record = db.ListField(db.EmbeddedDocumentField(UserEditRecord), default = [])
     	# meta = {'indexes': [
     	# 	{'fields': ['$email', '$name'],

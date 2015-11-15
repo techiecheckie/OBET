@@ -9,7 +9,7 @@
 <div class="col-md-4">
 
 {% for l in lit %}
- <a href="{{ url_for('main.lit', title = l.title) }}"><button type="button">
+ <a href="{{ url_for('main.lit', lit_id = l.id) }}"><button type="button">
  	<p>Title: {{l.title}}</p>
 	<p>Type: {{l.refType}}</p>
 	<p>Author: {{l.author}}</p>

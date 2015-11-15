@@ -10,9 +10,9 @@
  <h1>Search For Literature</h1>	
 </div>
 
-{% set category = "title" %}
-<meta id="category" data-name="{{category}}">
 <meta id="searchString" data-name="{{searchString}}">
+<meta id="sortString" data-name="{{sortString}}">
+
 {% if searchTerm %}
   {% set searchString = searchTerm %}
 {% endif %}
@@ -20,6 +20,7 @@
 <div class="container">
   <h2>Results</h2>
   <p>References that match your search query:</p>   
+
 <table class="table" >  
     <thead>
       <tr>
@@ -28,17 +29,20 @@
       	<th >Author </th>
         <th >Primary Field </th>
       	<th >Description</th>
+        <th >Creator </th>
       </tr>
  	</thread> 	
     <tbody>
-  	{% for l in lit | sort(attribute=category)%} 
+
+    {% for l in lit %}
 
     	<tr>
-    		<td><a href="{{ url_for('main.lit', title = l.title) }}">{{l.title}}</a></td> 
+    		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
     		<td>{{l.refType}}</td>
     		<td>{{l.author}}</td>
         <td>{{l.primaryField}}</td>
     		<td>{{l.description}}</td>
+        <td>{{l.creator}}
     	</tr>
     {% endfor %}
     </tbody>
@@ -46,9 +50,23 @@
 </div>
 
 <br>
-<br>	
+<br>
 
- {{ wtf.quick_form(form) }}
+{{ wtf.quick_form(form) }}
+ 
+<!--  <br> 
+
+<form id="sort" action="{{ url_for('main.search', searchStr = searchString) }}">
+  Sort By:
+  <select name="sortby">
+      <option value="title" {% if selected %} {% set sortString = "title" %} {% endif %}> Title </option>
+      <option value="type"> Type </option>
+      <option value="author"> Author </option>
+      <option value="primaryField"> Primary Field </option>
+  </select>
+
+</form> <button type="submit" form="sort" value="Sort"> Sort </button> -->
+
  <p>
  <br>
  Rather do an explicit search?

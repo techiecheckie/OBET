@@ -3,21 +3,46 @@
 {% block title %}OBET - Precise Search For Literature{% endblock %}
 {% block page_content %}
 <div class="page-header">
- <h1>Search For Literature</h1>	
+ <h1>Advanced Search For Literature</h1>	
 </div>
 
 <div class="col-md-4">
 
-{% for l in lit %}
- <a href="{{ url_for('main.lit', title = l.title) }}"><button type="button">
- 	<p>Title: {{l.title}}</p>
-	<p>Type: {{l.refType}}</p>
-	<p>Author: {{l.author}}</p>
-	<p>Description: {{l.description}}</p>
-</button></a>
+
+<div class="container">
+  <h2>Results</h2>
+  <p>References that match your search query:</p>   
+
+<table class="table" >  
+    <thead>
+      <tr>
+		<th >Title </th>
+      	<th >Type </th>
+      	<th >Author </th>
+        <th >Primary Field </th>
+      	<th >Description</th>
+        <th >Creator </th>
+      </tr>
+ 	</thread> 	
+    <tbody>
+
+    {% for l in lit %}
+
+    	<tr>
+    		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
+    		<td>{{l.refType}}</td>
+    		<td>{{l.author}}</td>
+        <td>{{l.primaryField}}</td>
+    		<td>{{l.description}}</td>
+        <td>{{l.creator}}
+    	</tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
 <br>
-<br>	
-{% endfor %}
+<br>
 
  {{ wtf.quick_form(form) }}
  <p>

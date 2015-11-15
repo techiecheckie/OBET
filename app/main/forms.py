@@ -8,7 +8,8 @@ from wtforms.fields.html5 import EmailField
 
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
-    	submit = SubmitField('Search')
+        sort = SelectField('Sort by: ', choices = [('title', 'Title'), ('author', 'Author'), ('refType', 'Type'), ('primaryField', 'Primary Field')])
+        submit = SubmitField('Search')
     	
 class ExactSearchForm(Form):
     	refType = SelectField('Reference Type', choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),
@@ -24,7 +25,7 @@ class AddLitForm(Form):
     secondaryField = SelectField('Secondary Field', choices = [('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'), ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'), ('History/Politics/Law','History/Politics/Law'), ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'), ('Animal Science/Welfare','Animal Science/Welfare'), ('Ecology/Conservation','Ecology/Conservation'), ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'), ('Education/Living','Education/Living')])
     title = StringField('Title', validators = [Required(), Length(1,150)])
     author = StringField('Author', validators = [Length(1,120)])
-    description = TextAreaField('Description', validators = [ Length(1,1000)])
+    description = TextAreaField('Description', validators = [ Length(1,2000)])
 	# edition = IntegerField('Edition') 
 	# pages = StringField('Pages', validators = [Length(1,10)])
 	# yrPublished = IntegerField('Year Published', validators = [NumberRange(min=1800)]) # MUST ADD max_value!!! Limit it to THIS year!!

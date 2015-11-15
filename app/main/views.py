@@ -14,7 +14,7 @@ def index():
  	return render_template('index.html', current_time = datetime.utcnow())
 
 
-#########################
+##################
 # Fuzzy Search
 ##################
 
@@ -22,14 +22,25 @@ def index():
 def search():
  form = SearchForm()
  if form.validate_on_submit():
+ 	print 'form is validated'
  	queryString = str(form.search.data)
  	lit = Lit.objects.search_text(queryString).order_by('$text_score')
  	if len(lit) == 0:
  			flash("Your search returned nothing. Try other search terms.")
  	else:
+ 		sortStr = str(form.sort.data)
+ 		lit = sorted(lit, key=lambda lit: getattr(lit, sortStr))
  		return render_template('search.html', form = form, lit = lit)
  	return redirect(url_for('main.search'))
  return render_template('search.html', form = form)
+
+# ####################
+# # Search Sorted
+# ####################
+
+# @main.route('/search/sorted', methods=['GET', 'POST'])
+# def searchSort():
+# 	print 'sorted'
 
 ###############
 # Strict Search
@@ -98,9 +109,9 @@ def user(email):
 # Lit Main Page #
 #################
 
-@main.route('/lit/<title>')
-def lit(title):
-	lit = Lit.objects(title__iexact = title).first()
+@main.route('/lit/<lit_id>')
+def lit(lit_id):
+	lit = Lit.objects(id__iexact = lit_id).first()
 	if lit is None:
 		abort(404)
 	return render_template('lit.html', lit = lit)
@@ -129,15 +140,20 @@ def addLit():
 		editHist = LitEditRecord(lastUserEdited = current_user.name)
 		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data, creator = current_user.name)
 		lit.save()
+		
+		# Update lit history
 		lit.update(push__l_edit_record=editHist)
 		lit.update(set__last_edit = editHist)
 		lit.reload()
+
+		# Update user edit history
 		userHist = UserEditRecord(litEdited = str(lit.id), operation = "add", litEditedTitle = lit.title)
 		current_user.update(push__u_edit_record=userHist)
 		current_user.reload()
+		
 		print editHist.lastUserEdited
 		flash("Successfully added!")				
- 		return redirect(url_for('main.lit', title = lit.title))
+ 		return redirect(url_for('main.lit', lit_id = lit.id))
  	return render_template('addLit.html', form = form)
 
 ##############
@@ -149,6 +165,7 @@ def addLit():
 def updateLit(lit_id):
 	lit = Lit.objects(id__iexact = lit_id).first()
 	form = AddLitForm()
+
 	# Prepopulate the field with literature object information
 	form.refType.data = lit.refType
 	form.title.data = lit.title
@@ -174,13 +191,18 @@ def updateLitSub(lit_id):
 		lit.update(set__description=form.description.data)
 		lit.update(set__primaryField=form.primaryField.data)
 		lit.update(set__secondaryField=form.secondaryField.data)
+
+	# Update Lit history	
 	editHist = LitEditRecord(lastUserEdited = current_user.name)
 	lit.update(push__l_edit_record=editHist)
 	lit.update(set__last_edit = editHist)
 	lit.reload()
+
+	# Update User edit history
 	userHist = UserEditRecord(litEdited = str(lit.id), operation = "update", litEditedTitle = lit.title)
 	current_user.update(push__u_edit_record=userHist)
 	current_user.reload()
+
 	lit = Lit.objects(id__iexact = lit_id).first()
 	flash(lit.title + " has been updated")
 	return render_template('lit.html', lit = lit)
@@ -220,7 +242,7 @@ def deleteLit():
 		if len(lit) == 0:
  			flash("Your search returned nothing. Try other search terms.")
  		else:
- 			return render_template('deleteLit.html', form = form, lit = lit, litEditedTitle = lit.title)
+ 			return render_template('deleteLit.html', form = form, lit = lit)
  		return redirect(url_for('main.deleteLit'))
  	return render_template('deleteLit.html', form = form)
 

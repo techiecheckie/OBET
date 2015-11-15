@@ -39,7 +39,7 @@
  				<li> 
 				{{ la.operation }}
 				{% if la.operation|string() != 'delete' %} 
-					<a href="{{ url_for('main.lit', title = la.litEditedTitle) }}"> 
+					<a href="{{ url_for('main.lit', lit_id = la.litEdited) }}"> 
 				{% endif %}
 				{{ la.litEditedTitle }} 
 				{% if la.operation|string() != 'delete' %} </a> {% endif %}

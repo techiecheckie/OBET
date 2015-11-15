@@ -33,25 +33,26 @@ from flask.ext.login import current_user
 def register():
  	form = RegistrationForm()
  	if form.validate_on_submit():
- 		user = User()
- 		user.email = form.email.data
- 		user.name = form.name.data
- 		user.password = form.password.data
- 		user.save()
- 		name = form.name.data
- 		email = form.email.data
- 		reason = form.reason.data
-		if form.email.data == current_app.config['OBET_ADMIN']:
-			flash('Welcome to OBET, new Admin! Please log in to continue.')
-			return redirect(url_for('auth.login'))
- 		send_email('jaying.wu25@qmail.cuny.edu', 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
- 		flash('The admin must approve your registration before you will be able to register. Check your email soon.')
- 		
- 		
- 		#token = user.generate_confirmation_token()
- 		#send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
- 		#flash('A confirmation email has been sent to you by email.')
- 		return redirect(url_for('main.index'))
+            user = User()
+            user.email = form.email.data
+            user.name = form.name.data
+            user.password = form.password.data
+            user.save()
+            name = form.name.data
+            email = form.email.data
+            reason = form.reason.data
+            if form.email.data == current_app.config['OBET_ADMIN']:
+                flash('Welcome to OBET, new Admin! Please log in to continue.')
+                user.approve()
+                return redirect(url_for('auth.login'))
+            send_email('jaying.wu25@qmail.cuny.edu', 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
+            flash('The admin must approve your registration before you will be able to register. Check your email soon.')
+
+
+     		#token = user.generate_confirmation_token()
+     		#send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)
+     		#flash('A confirmation email has been sent to you by email.')
+        return redirect(url_for('main.index'))
  	return render_template('auth/register.html', form = form)
 
 
@@ -168,8 +169,6 @@ def resend_confirmation():
  	flash('A new confirmation email has been sent to you by email.')
  	return redirect(url_for('main.index'))
  	
- 	
-
 
 @auth.route('/change-password', methods=['GET', 'POST'])
 @login_required
