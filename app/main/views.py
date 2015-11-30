@@ -152,19 +152,19 @@ def addLit():
 		lit.update(set__notes = form.notes.data)
 		lit.update(set__secondaryField = form.secondaryField.data)
 
-		# keywords = (form.keywords.data).split(",")
-		# print "this is the keywords: " + form.keywords.data
-		# for x in range(0, len(keywords)):
-		# 	print keywords[x].strip()
-		# 	key = str(keywords[x].strip())
-		# 	print key
-		# 	print type(key )
-		# 	lit.update(push__keywords = key)
-
 		if form.link.data is not None:
 			print "this is the link: " + form.link.data
 			lit.update(set__link = form.link.data)
 		
+		# Add keywords
+		keywordslist = (form.keywords.data).split(",")
+		print "this is the keywords: " + form.keywords.data
+		for x in range(0, len(keywordslist)):
+			key = str(keywordslist[x].strip())
+			print key
+			print type(key)
+			lit.update(push__keywords = key)
+
 		# Update lit history
 		lit.update(push__l_edit_record=editHist)
 		lit.update(set__last_edit = editHist)
@@ -234,6 +234,14 @@ def updateLitSub(lit_id):
 		lit.update(set__notes = form.notes.data)
 		lit.update(set__secondaryField= form.secondaryField.data)
 		lit.update(set__link = form.link.data)
+
+		keywordslist = (form.keywords.data).split(",")
+		print "this is the keywords: " + form.keywords.data
+		for x in range(0, len(keywordslist)):
+			key = str(keywordslist[x].strip())
+			print key
+			print type(key)
+			lit.update(push__keywords = key)
 
 		# Update Lit history	
 		editHist = LitEditRecord(lastUserEdited = current_user.name)

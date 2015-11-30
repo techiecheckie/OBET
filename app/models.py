@@ -205,36 +205,6 @@ FIELDS = (('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'),
             ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'),
             ('Education/Living','Education/Living'))
 
-
-
-# Source Title
-
-# Editor
-
-# Place Published
-
-# Publisher
-
-# Volume
-
-# Number
-
-# Pages
-
-# Keywords
-
-# Abstract
-
-# Notes
-
-# Primary Field (closed list)
-
-# Secondary Field (closed list)
-
-# External Link
-
-# DOI
-
 class Lit(db.Document):
     	refType = db.StringField(max_length = 30, required = True, choices=REFTYPES)
         author = db.StringField(max_length = 30, unique_with = ['title'])
@@ -248,7 +218,7 @@ class Lit(db.Document):
         volume = db.StringField(max_length = 150)
         number = db.StringField(max_length = 100)
         pages = db.StringField(default = None)
-        keywords = db.ListField(StringField(max_length = 40), default = [])
+        keywords = db.ListField(db.StringField(max_length=30), default = [])
         abstract = db.StringField(max_length = 2000)
         notes = db.StringField(max_length = 1500)
         primaryField = db.StringField(required=True, choices=FIELDS)
@@ -262,9 +232,9 @@ class Lit(db.Document):
     	# meta = {
      #        'indexes': [
     	# 	  {
-     #          'fields': ['$title', '$author', "$description"],
+     #          'fields': ['$title', '$author', "$notes", '$keywords'],
     	# 	  'default_language': 'english',
-    	# 	  'weight': {'title': 100, 'author': 50, 'description': 10}
+    	# 	  'weight': {'title': 100, 'author': 50, 'notes': 10 , 'keywords':40}
     	# 	  }
     	# ]}
 
