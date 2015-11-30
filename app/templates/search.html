@@ -25,10 +25,12 @@
     <thead>
       <tr>
 		    <th> Title </th>
-      	<th> Type </th>
       	<th> Author </th>
         <th> Primary Field </th>
-      	<th> Description</th>
+        <th> Source Title </th>
+        <th> Editor </th>
+        <th> Year Published </th>
+        <th> Type </th>
         <th> Creator </th>
         <th> Date Created </th>
         <th> Last Modified </th>
@@ -41,10 +43,12 @@
 
     	<tr>
     		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
-    		<td>{{l.refType}}</td>
     		<td>{{l.author}}</td>
         <td>{{l.primaryField}}</td>
-    		<td>{{l.description}}</td>
+    		<td>{{l.sourceTitle}}</td>
+        <td>{{l.editor}}</td>    
+        <td>{{l.yearPublished}}</td>
+        <td>{{l.refType}}</td>    
         <td>{{l.creator}}</td>
         <td>{{l.created_date}}</td>
         <td>{{l.last_edit.date}}</td>

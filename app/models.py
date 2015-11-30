@@ -205,18 +205,56 @@ FIELDS = (('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'),
             ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'),
             ('Education/Living','Education/Living'))
 
+
+
+# Source Title
+
+# Editor
+
+# Place Published
+
+# Publisher
+
+# Volume
+
+# Number
+
+# Pages
+
+# Keywords
+
+# Abstract
+
+# Notes
+
+# Primary Field (closed list)
+
+# Secondary Field (closed list)
+
+# External Link
+
+# DOI
+
 class Lit(db.Document):
-    	refType = db.StringField(max_length = 30, required=True, choices=REFTYPES)
+    	refType = db.StringField(max_length = 30, required = True, choices=REFTYPES)
+        author = db.StringField(max_length = 30, unique_with = ['title'])
+    	title = db.StringField(max_length = 120, required = True, unique = True)
+        yrPublished = db.IntField(min_value = 1800, default = None) # MUST ADD max_value!!! Limit it to THIS year!!
+        # Journal title, book title, etc.
+        sourceTitle = db.StringField(max_length = 200)
+        editor = db.StringField(max_length = 150)
+        placePublished = db.StringField(max_length = 150)
+        publisher = db.StringField(max_length = 200)
+        volume = db.StringField(max_length = 150)
+        number = db.StringField(max_length = 100)
+        pages = db.StringField(default = None)
+        keywords = db.ListField(StringField(max_length = 40), default = [])
+        abstract = db.StringField(max_length = 2000)
+        notes = db.StringField(max_length = 1500)
         primaryField = db.StringField(required=True, choices=FIELDS)
         secondaryField = db.StringField(choices=FIELDS)
-    	title = db.StringField(max_length = 120, required = True, unique = True)
-    	author = db.StringField(max_length = 30, unique_with = ['title'])
-    	description = db.StringField(max_length = 500, required = True)
-    	edition = db.IntField(default = None)
-    	pages = db.StringField(default = None)
-    	yrPublished = db.IntField(min_value = 1800, default = None) # MUST ADD max_value!!! Limit it to THIS year!!
-    	tags = db.ListField(StringField(max_length = 30), default = [])
-    	link = db.URLField(max_length = 200, default = None)
+    	# edition = db.IntField(default = None)
+    	link = db.URLField(max_length = 300, default = None)
     	l_edit_record = db.SortedListField(db.EmbeddedDocumentField(LitEditRecord), default = [], ordering="date", reverse=True)
         last_edit = db.EmbeddedDocumentField(LitEditRecord)
         creator = db.StringField(max_length = 30, required = True)

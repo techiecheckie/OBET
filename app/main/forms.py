@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
 from wtforms import StringField, TextAreaField, BooleanField, SubmitField, FieldList, IntegerField, SelectField
-from wtforms.validators import Required, Length, Email, Regexp, NumberRange
+from wtforms.validators import Required, Length, Optional, Email, Regexp, NumberRange, URL
 from wtforms import ValidationError
 #from flask.ext.pagedown.fields import PageDownField
 from ..models import User, Lit, Role
@@ -20,18 +20,23 @@ class ExactSearchForm(Form):
     	submit = SubmitField('Search')
     	
 class AddLitForm(Form):
-    refType = SelectField('Reference Type', validators = [Required()], choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),
-        ('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')])
-    primaryField = SelectField('Primary Field', validators = [Required()], choices = [('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'), ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'), ('History/Politics/Law','History/Politics/Law'), ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'), ('Animal Science/Welfare','Animal Science/Welfare'), ('Ecology/Conservation','Ecology/Conservation'), ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'), ('Education/Living','Education/Living')]) 
-    secondaryField = SelectField('Secondary Field', choices = [('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'), ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'), ('History/Politics/Law','History/Politics/Law'), ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'), ('Animal Science/Welfare','Animal Science/Welfare'), ('Ecology/Conservation','Ecology/Conservation'), ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'), ('Education/Living','Education/Living')])
+    refType = SelectField('Reference Type', validators = [Required()], choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')])
+    author = StringField('Author', validators = [Length(0,120)])
     title = StringField('Title', validators = [Required(), Length(1,150)])
-    author = StringField('Author', validators = [Length(1,120)])
-    description = TextAreaField('Description', validators = [ Length(1,2000)])
-	# edition = IntegerField('Edition') 
-	# pages = StringField('Pages', validators = [Length(1,10)])
-	# yrPublished = IntegerField('Year Published', validators = [NumberRange(min=1800)]) # MUST ADD max_value!!! Limit it to THIS year!!
-	# tags = FieldList(StringField('Tags'))
-	# link = FieldList(StringField('Links'))
+    yrPublished = IntegerField('Year Published', validators = [NumberRange(min=1800), Optional()])  # MUST ADD max_value!!! Limit it to THIS year!!
+    sourceTitle = StringField('SourceTitle', validators = [Length(0,200)])
+    editor = StringField('Editor', validators = [Length(0,150)])
+    placePublished = StringField('Place Published', validators = [Length(0,150)])
+    publisher = StringField('Publisher', validators = [Length(0,200)])
+    volume = StringField('Volume', validators = [Length(0,150)])
+    number = StringField('Number', validators = [Length(0,100)])
+    pages = StringField('Pages', validators = [Length(0,120)])
+    keywords = StringField('Keywords', validators = [Length(0,250)])
+    abstract = TextAreaField('Abstract', validators = [Length(0,2000)])
+    notes = TextAreaField('Notes', validators = [Length(0,500)])
+    primaryField = SelectField('Primary Field', validators = [Required()], choices = [('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'), ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'), ('History/Politics/Law','History/Politics/Law'), ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'), ('Animal Science/Welfare','Animal Science/Welfare'), ('Ecology/Conservation','Ecology/Conservation'), ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'), ('Education/Living','Education/Living')]) 
+    secondaryField = SelectField('Secondary Field', choices = [('','None'), ('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'), ('Anthropology/Psychology/Sociology','Anthropology/Psychology/Sociology'), ('History/Politics/Law','History/Politics/Law'), ('Agriculture/Energy/Industry','Agriculture/Energy/Industry'), ('Animal Science/Welfare','Animal Science/Welfare'), ('Ecology/Conservation','Ecology/Conservation'), ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'), ('Education/Living','Education/Living')])
+    link = StringField('Link', validators = [URL(), Optional()], filters = [lambda x: x or None])
     submit = SubmitField('Submit')   
     	
 class DeleteUserForm(Form):

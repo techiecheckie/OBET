@@ -1,68 +1,49 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
 {% block title %}OBET - Literature Profile{% endblock %}
 {% block page_content %}
-<div class="page-header">
- <h1>Title: {{ lit.title }}</h1>
- <p>
- {% if lit.refType %}Reference Type: {{ lit.refType }}{% endif %}
- </p>
-  <p>
- {% if lit.primaryField %}Primary Field: {{ lit.primaryField }}{% endif %}
- </p>
-  <p>
- {% if lit.secondaryField %}Secondary Field: {{ lit.secondaryField }}{% endif %}
- </p>
-  <p>
- Title: {% if lit.title %}{{ lit.title }}{% endif %}
- </p>
-  <p>
- {% if lit.author %}Author: {{ lit.author }}{% endif %}
- </p>
-  <p>
- {% if lit.description %} Description: {{ lit.description }}{% endif %}
- </p>
- <p>
- {% if lit.edition %}Edition: {{ lit.edition }}{% endif %}
- </p>
- <p>
- {% if lit.yrPublished %} Year published: {{ lit.yrPublished }}{% endif %}
- </p>
- <p>
- Creator: {{ lit.creator }} 
- </p>
- <p>
- Date Created: {{ lit.created_date}}
-</p>
- <p>Last Updated by: 
- 	 {% if lit.last_edit %} 
- 	 	{{ lit.last_edit.lastUserEdited }}
- 	 	<br> 
- 	 	&nbsp;&nbsp;on date: {{ lit.last_edit.date }} 
- 	 {% else %}
- 	 None
- 	 {% endif %}
- </p>
- <p>
- Tags: 
- {% if lit.tags %}
- 	<ul>
- 		{% for t in tags %}
- 			<li>{{ lit.t }}</li>
- 		{% endfor %}
- 	</ul>
- 	{% else %}
- 	 None
- {% endif %}
- </p>
 
- {% if current_user.is_administrator() %}
- <p>
- <a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}"><button type="button">Delete</button></a>
- </p>
- <p>
- <a href="{{ url_for('main.updateLit', lit_id = lit.id) }}"><button type="button">Update</button></a>
- </p>
-  {% endif %}
+<div class="page-header">
+	<h1>Title: {{ lit.title }}</h1>
+	<p>{% if lit.refType %}Reference Type: {{ lit.refType }}{% endif %} </p>
+	<p>{% if lit.author %}Author: {{ lit.author }}{% endif %}</p>
+	<p>{% if lit.yrPublished %}Year Published: {{ lit.yrPublished }}{% endif %}</p>
+	<p>{% if lit.sourceTitle %}Source Title: {{ lit.sourceTitle }}{% endif %}</p>
+	<p>{% if lit.editor %}Editor: {{ lit.editor }}{% endif %}</p>
+	<p>{% if lit.placePublished %}Place Published: {{ lit.placePublished }}{% endif %}</p>
+	<p>{% if lit.publisher %}Publisher: {{ lit.publisher }}{% endif %} </p>
+	<p>{% if lit.volume %}Volume: {{ lit.volume }}{% endif %}</p>
+	<p>{% if lit.number %}Number: {{ lit.number }}{% endif %}</p>
+	<p>{% if lit.pages %}Pages: {{ lit.pages }}{% endif %}</p>
+	<p>Keywords: {% if lit.keywords %}
+		<ul>
+			{% for t in lit.keywords %}
+			<li>{{ t }}</li> {% endfor %}
+		</ul>
+	{% else %} None {% endif %}
+	</p>
+	<p>{% if lit.abstract %}Abstract: {{ lit.abstract }}{% endif %}</p>
+	<p>{% if lit.notes %}Notes: {{ lit.notes }}{% endif %}</p>
+	<p>{% if lit.primaryField %}Primary Field: {{ lit.primaryField }}{% endif %}</p>
+	<p>{% if lit.secondaryField %}Secondary Field: {{ lit.secondaryField }}{% endif %}</p>
+	<p>
+	<p>{% if lit.link %} Link: {{ lit.link }}{% endif %}</p>
+	<p>
+		Creator: {{ lit.creator }} <br> &nbsp;&nbsp;on date: {{ lit.created_date}}
+	</p>
+	<p>
+		Last Updated by: {% if lit.last_edit %} {{ lit.last_edit.lastUserEdited }} 
+			<br> &nbsp;&nbsp;on date: {{ lit.last_edit.date }} {% else %} None {% endif %}
+	</p>
+
+	{% if current_user.is_administrator() %}
+	<p>
+		<a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}">
+			<button type="button">Delete</button></a>
+	</p>
+	<p>
+		<a href="{{ url_for('main.updateLit', lit_id = lit.id) }}">
+			<button type="button">Update</button></a>
+	</p>
+	{% endif %}
 </div>
 {% endblock %}

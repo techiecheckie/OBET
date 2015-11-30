@@ -40,14 +40,6 @@ def search():
  	return redirect(url_for('main.search'))
  return render_template('search.html', form = form)
 
-# ####################
-# # Search Sorted
-# ####################
-
-# @main.route('/search/sorted', methods=['GET', 'POST'])
-# def searchSort():
-# 	print 'sorted'
-
 ###############
 # Strict Search
 ###################
@@ -140,14 +132,38 @@ def addLit():
 		#########################################################
 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data).first()
 		if lit is not None:
- 			flash("This is already in the DB.")
+ 			flash("This is already in the DB. This is the page")
  			## Change addLit to updateLit.
-			return render_template('update.html', form = form, lit = lit)
+			return render_template('lit.html', lit = lit)
 		
 		editHist = LitEditRecord(lastUserEdited = current_user.name)
 
-		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, description=form.description.data, primaryField = form.primaryField.data, secondaryField = form.secondaryField.data, creator = current_user.name)
+		lit = Lit(refType = form.refType.data, title = form.title.data, author = form.author.data, primaryField = form.primaryField.data, creator = current_user.name)
 		lit.save()
+		lit.update(set__yrPublished = form.yrPublished.data)
+		lit.update(set__sourceTitle = form.sourceTitle.data)
+		lit.update(set__editor = form.editor.data)
+		lit.update(set__placePublished = form.placePublished.data)
+		lit.update(set__publisher = form.publisher.data)
+		lit.update(set__volume = form.volume.data)
+		lit.update(set__number = form.number.data)
+		lit.update(set__pages = form.pages.data)
+		lit.update(set__abstract = form.abstract.data)
+		lit.update(set__notes = form.notes.data)
+		lit.update(set__secondaryField = form.secondaryField.data)
+
+		# keywords = (form.keywords.data).split(",")
+		# print "this is the keywords: " + form.keywords.data
+		# for x in range(0, len(keywords)):
+		# 	print keywords[x].strip()
+		# 	key = str(keywords[x].strip())
+		# 	print key
+		# 	print type(key )
+		# 	lit.update(push__keywords = key)
+
+		if form.link.data is not None:
+			print "this is the link: " + form.link.data
+			lit.update(set__link = form.link.data)
 		
 		# Update lit history
 		lit.update(push__l_edit_record=editHist)
@@ -156,10 +172,9 @@ def addLit():
 
 		# Update user edit history
 		userHist = UserEditRecord(litEdited = str(lit.id), operation = "add", litEditedTitle = lit.title)
-		current_user.update(push__u_edit_record=userHist)
+		current_user.update(push__u_edit_record = userHist)
 		current_user.reload()
 		
-		print editHist.lastUserEdited
 		flash("Successfully added!")				
  		return redirect(url_for('main.lit', lit_id = lit.id))
  	return render_template('addLit.html', form = form)
@@ -178,9 +193,19 @@ def updateLit(lit_id):
 	form.refType.data = lit.refType
 	form.title.data = lit.title
 	form.author.data = lit.author
-	form.description.data = lit.description
+	form.yrPublished.data = lit.yrPublished
+	form.sourceTitle.data = lit.sourceTitle
+	form.editor.data = lit.editor
+	form.placePublished.data = lit.placePublished
+	form.publisher.data = lit.publisher
+	form.volume.data = lit.volume
+	form.number.data = lit.number
+	form.pages.data = lit.pages
+	form.abstract.data = lit.abstract
+	form.notes.data = lit.notes
 	form.primaryField.data = lit.primaryField
 	form.secondaryField.data = lit.secondaryField
+	form.link.data = lit.link
 	return render_template('update.html', form = form, lit = lit)
 
 #################
@@ -196,23 +221,35 @@ def updateLitSub(lit_id):
 		lit.update(set__title=form.title.data)
 		lit.update(set__refType=form.refType.data)
 		lit.update(set__author=form.author.data)
-		lit.update(set__description=form.description.data)
 		lit.update(set__primaryField=form.primaryField.data)
-		lit.update(set__secondaryField=form.secondaryField.data)
+		lit.update(set__yrPublished = form.yrPublished.data)
+		lit.update(set__sourceTitle = form.sourceTitle.data)
+		lit.update(set__editor = form.editor.data)
+		lit.update(set__placePublished = form.placePublished.data)
+		lit.update(set__publisher = form.publisher.data)
+		lit.update(set__volume = form.volume.data)
+		lit.update(set__number = form.number.data)
+		lit.update(set__pages = form.pages.data)
+		lit.update(set__abstract = form.abstract.data)
+		lit.update(set__notes = form.notes.data)
+		lit.update(set__secondaryField= form.secondaryField.data)
+		lit.update(set__link = form.link.data)
 
-	# Update Lit history	
-	editHist = LitEditRecord(lastUserEdited = current_user.name)
-	lit.update(push__l_edit_record=editHist)
-	lit.update(set__last_edit = editHist)
-	lit.reload()
+		# Update Lit history	
+		editHist = LitEditRecord(lastUserEdited = current_user.name)
+		lit.update(push__l_edit_record=editHist)
+		lit.update(set__last_edit = editHist)
+		lit.reload()
 
-	# Update User edit history
-	userHist = UserEditRecord(litEdited = str(lit.id), operation = "update", litEditedTitle = lit.title)
-	current_user.update(push__u_edit_record=userHist)
-	current_user.reload()
+		# Update User edit history
+		userHist = UserEditRecord(litEdited = str(lit.id), operation = "update", litEditedTitle = lit.title)
+		current_user.update(push__u_edit_record=userHist)
+		current_user.reload()
 
-	lit = Lit.objects(id__iexact = lit_id).first()
-	flash(lit.title + " has been updated")
+		lit = Lit.objects(id__iexact = lit_id).first()
+		flash(lit.title + " has been updated")
+	else:
+		flash(lit.title + " failed to be updated")
 	return render_template('lit.html', lit = lit)
 
 ################
