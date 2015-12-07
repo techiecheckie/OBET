@@ -95,8 +95,6 @@ def exactSearch():
 @main.route('/user/<email>')
 def user(email):
 	user = User.objects(email__iexact = email).first()
-	if user is None:
-		abort(404)
 	latest_activity = current_user.u_edit_record
 	latest_activity = sorted(latest_activity, key=lambda la: la.date, reverse=True)
 	latest_activity = latest_activity[0:5]
@@ -188,6 +186,7 @@ def addLit():
 def updateLit(lit_id):
 	lit = Lit.objects(id__iexact = lit_id).first()
 	form = AddLitForm()
+	keywordslist = ', '.join(lit.keywords).encode('utf-8')
 
 	# Prepopulate the field with literature object information
 	form.refType.data = lit.refType
@@ -206,6 +205,7 @@ def updateLit(lit_id):
 	form.primaryField.data = lit.primaryField
 	form.secondaryField.data = lit.secondaryField
 	form.link.data = lit.link
+	form.keywords.data = keywordslist
 	return render_template('update.html', form = form, lit = lit)
 
 #################
@@ -235,6 +235,7 @@ def updateLitSub(lit_id):
 		lit.update(set__secondaryField= form.secondaryField.data)
 		lit.update(set__link = form.link.data)
 
+		lit.update(set__keywords = [])
 		keywordslist = (form.keywords.data).split(",")
 		print "this is the keywords: " + form.keywords.data
 		for x in range(0, len(keywordslist)):

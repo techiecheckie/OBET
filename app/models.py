@@ -41,15 +41,15 @@ class User(UserMixin, db.Document):
     	approved = db.BooleanField(default = False)
     	role = db.ReferenceField('Role')
     	member_since = db.DateTimeField(default = datetime.datetime.now)
- 	last_seen = db.DateTimeField(default = datetime.datetime.now)
- 	u_edit_record = db.SortedListField(db.EmbeddedDocumentField(UserEditRecord), ordering="date", reverse=True, default = [])
-    	# meta = {'indexes': [
-    	# 	{'fields': ['$email', '$name'],
-    	# 	 'default_language': 'english',
-    	# 	 'weight': {'email': 100, 'name': 50}
-    	# 	}
-    	# ]}
-     
+        last_seen = db.DateTimeField(default = datetime.datetime.now)
+        u_edit_record = db.SortedListField(db.EmbeddedDocumentField(UserEditRecord), ordering="date", reverse=True, default = [])
+        search_display_fields = db.ListField(db.StringField(), default =['title','author'])
+        # meta = {'indexes': [
+        # 	{'fields': ['$email', '$name'],
+        # 	 'default_language': 'english',
+        # 	 'weight': {'email': 100, 'name': 50}
+        # 	}
+        # ]}     
         		
     	def __repr__(self):
  		return '<User %s, %s>' % (self.name, self.email)
@@ -219,8 +219,8 @@ class Lit(db.Document):
         number = db.StringField(max_length = 100)
         pages = db.StringField(default = None)
         keywords = db.ListField(db.StringField(max_length=30), default = [])
-        abstract = db.StringField(max_length = 2000)
-        notes = db.StringField(max_length = 1500)
+        abstract = db.StringField(max_length = 3000)
+        notes = db.StringField(max_length = 2000)
         primaryField = db.StringField(required=True, choices=FIELDS)
         secondaryField = db.StringField(choices=FIELDS)
     	# edition = db.IntField(default = None)

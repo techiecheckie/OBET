@@ -30,7 +30,7 @@ class AddLitForm(Form):
     publisher = StringField('Publisher', validators = [Length(0,200)])
     volume = StringField('Volume', validators = [Length(0,150)])
     number = StringField('Number', validators = [Length(0,100)])
-    pages = StringField('Pages', validators = [Length(0,120)])
+    pages = StringField('Pages', validators = [Length(0,200)])
     keywords = StringField('Keywords', validators = [Length(0,250)])
     abstract = TextAreaField('Abstract', validators = [Length(0,2000)])
     notes = TextAreaField('Notes', validators = [Length(0,500)])
