@@ -17,7 +17,8 @@
 	<p>Keywords: {% if lit.keywords %}
 		<ul>
 			{% for t in lit.keywords %}
-			<li>{{ t }}</li> {% endfor %}
+			{% if t is not none %}<li>{{ t }}</li>{% endif %} 
+			{% endfor %}
 		</ul>
 	{% else %} None {% endif %}
 	</p>

@@ -238,11 +238,10 @@ def updateLitSub(lit_id):
 		lit.update(set__keywords = [])
 		keywordslist = (form.keywords.data).split(",")
 		print "this is the keywords: " + form.keywords.data
-		for x in range(0, len(keywordslist)):
+		for x in range(0, len(keywordslist)-1):
 			key = str(keywordslist[x].strip())
-			print key
-			print type(key)
-			lit.update(push__keywords = key)
+			if key is not None :
+				lit.update(push__keywords = key)
 
 		# Update Lit history	
 		editHist = LitEditRecord(lastUserEdited = current_user.name)
