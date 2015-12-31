@@ -1,7 +1,8 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, TextAreaField, BooleanField, SubmitField, FieldList, IntegerField, SelectField
+from wtforms import StringField, TextAreaField, BooleanField, SubmitField, FieldList, IntegerField, SelectField, SelectMultipleField
 from wtforms.validators import Required, Length, Optional, Email, Regexp, NumberRange, URL
 from wtforms import ValidationError
+from wtforms import widgets
 #from flask.ext.pagedown.fields import PageDownField
 from ..models import User, Lit, Role
 from wtforms.fields.html5 import EmailField
@@ -50,14 +51,32 @@ class DeleteLitForm(Form):
         author = StringField('Author', validators = [Required(), Length(1,120)])
     	submit = SubmitField('Delete Lit')
 
+# Not currently in use
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
 class EditProfileForm(Form):
- 	name = StringField('Name', validators=[Length(0, 64)])
- 	credentials = StringField('Credentials', validators=[Length(0, 64)])
- 	location = StringField('Location', validators=[Length(0, 64)])
- 	description = TextAreaField('About me', validators=[Length(0, 1000)])
- 	submit = SubmitField('Update Profile')
- 	
-    	
+    title = BooleanField('Title')
+    author = BooleanField('Author')
+    primaryField = BooleanField('Primary Field')
+    #sourceTitle = BooleanField('Source Title')
+    editor = BooleanField('Editor')
+    yearPublished = BooleanField('Year Published')
+    refType = BooleanField('Reference Type')
+    creator = BooleanField('Creator')
+    dateCreatedOn = BooleanField('Date Created')
+    lastModified = BooleanField('Last Modified')
+    lastModifiedBy = BooleanField('Last Modified By')
+    name = StringField('Name', validators=[Length(0, 64)])
+    credentials = StringField('Credentials', validators=[Length(0, 64)])
+    location = StringField('Location', validators=[Length(0, 64)])
+    description = TextAreaField('About me', validators=[Length(0, 1000)])
+        #list_of_fields = ["Title", "Author", "Primary Field","Source Title", "Editor", "Year Published", "Type", "Creator", "Date Created", "Last Modified", "Last Modified By"]
+        #fields = [(x, x) for x in list_of_fields]
+        #searchFields = MultiCheckboxField('Search Table Fields', choices=fields)
+    submit = SubmitField('Update')
+
 class EditProfileAdminForm(Form):
  	email = StringField('Email', validators=[Required(), Length(1, 64), Email()])
  	role = SelectField('Role')
@@ -67,7 +86,7 @@ class EditProfileAdminForm(Form):
  	confirmed = BooleanField('Confirmed')
  	approved = BooleanField('Approved')
  	activated = BooleanField('Activated')
- 	submit = SubmitField('Submit')
+        submit = SubmitField('Update')
 
  	def __init__(self, user, *args, **kwargs):
  		super(EditProfileAdminForm, self).__init__(*args, **kwargs)

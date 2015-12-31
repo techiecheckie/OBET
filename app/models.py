@@ -43,7 +43,19 @@ class User(UserMixin, db.Document):
     	member_since = db.DateTimeField(default = datetime.datetime.now)
         last_seen = db.DateTimeField(default = datetime.datetime.now)
         u_edit_record = db.SortedListField(db.EmbeddedDocumentField(UserEditRecord), ordering="date", reverse=True, default = [])
-        search_display_fields = db.ListField(db.StringField(), default =['title','author'])
+        title = db.BooleanField(default = True)
+        author = db.BooleanField(default = True)
+        primaryField = db.BooleanField(default = True)
+        sourceTitle = db.BooleanField(default = True)
+        editor = db.BooleanField(default = False)
+        yearPublished = db.BooleanField(default = False)
+        refType = db.BooleanField(default = False)
+        creator = db.BooleanField(default = False)
+        dateCreatedOn = db.BooleanField(default = False)
+        lastModified = db.BooleanField(default = False)
+        lastModifiedBy = db.BooleanField(default = False)
+        #list_of_fields = ["Title", "Author", "Primary Field","Source Title", "Editor", "Year Published", "Type", "Creator", "Date Created", "Last Modified", "Last Modified By"]
+        
         # meta = {'indexes': [
         # 	{'fields': ['$email', '$name'],
         # 	 'default_language': 'english',

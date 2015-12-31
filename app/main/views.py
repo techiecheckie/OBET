@@ -238,7 +238,7 @@ def updateLitSub(lit_id):
 		lit.update(set__keywords = [])
 		keywordslist = (form.keywords.data).split(",")
 		print "this is the keywords: " + form.keywords.data
-		for x in range(0, len(keywordslist)-1):
+		for x in range(0, len(keywordslist)):
 			key = str(keywordslist[x].strip())
 			if key is not None :
 				lit.update(push__keywords = key)
@@ -269,14 +269,35 @@ def updateLitSub(lit_id):
 def edit_profile():
  	form = EditProfileForm()
  	if form.validate_on_submit():
- 		current_user.name = form.name.data
- 		current_user.credentials = form.credentials.data
- 		current_user.description = form.description.data
+ 		current_user.update(set__name=form.name.data)
+ 		current_user.update(set__credentials = form.credentials.data)
+ 		current_user.update(set__description = form.description.data)
+ 		current_user.update(set__title = form.title.data)
+ 		current_user.update(set__author = form.author.data)
+ 		current_user.update(set__primaryField = form.primaryField.data)
+ 		#current_user.update(set__sourceTitle = form.sourceTitle.data)
+ 		current_user.update(set__editor = form.editor.data)
+ 		current_user.update(set__yearPublished = form.yearPublished.data)
+ 		current_user.update(set__refType = form.refType.data)
+ 		current_user.update(set__creator = form.creator.data)
+ 		current_user.update(set__dateCreatedOn = form.dateCreatedOn.data)
+ 		current_user.update(set__lastModified = form.lastModified.data)
+ 		current_user.update(set__lastModifiedBy = form.lastModifiedBy.data)
  		flash('Your profile has been updated.')
  		return redirect(url_for('.user', email = current_user.email))
  	form.name.data = current_user.name
  	form.credentials.data = current_user.credentials
  	form.description.data = current_user.description
+ 	form.title.data = current_user.title
+ 	form.author.data = current_user.author
+ 	form.primaryField.data = current_user.primaryField
+ 	form.editor.data = current_user.editor
+ 	form.yearPublished.data = current_user.yearPublished
+ 	form.refType.data = current_user.refType
+ 	form.creator.data = current_user.creator
+ 	form.dateCreatedOn.data = current_user.dateCreatedOn
+ 	form.lastModified.data = current_user.lastModified
+ 	form.lastModifiedBy.data = current_user.lastModifiedBy
  	return render_template('editProfile.html', form=form)
 
 #################################

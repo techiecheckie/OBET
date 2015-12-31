@@ -18,6 +18,8 @@
   {% set searchString = searchTerm %}
 {% endif %}
 
+{{ wtf.quick_form(form) }}
+
 <div class="container">
   <h2>Results</h2>
   <p>References that match your search query:</p>   
@@ -25,17 +27,17 @@
 <table class="table" >  
     <thead>
       <tr>
-		    <th> Title </th>
-      	<th> Author </th>
-        <th> Primary Field </th>
-        <th> Source Title </th>
-        <th> Editor </th>
-        <th> Year Published </th>
-        <th> Type </th>
-        <th> Creator </th>
-        <th> Date Created </th>
-        <th> Last Modified </th>
-        <th> Last Modified By </th>
+		    {%if current_user.title or current_user.is_anonymous() %} <th> Title </th> {%endif%}
+      	{%if current_user.author or current_user.is_anonymous() %} <th> Author </th> {%endif%}
+        {%if current_user.primaryField or current_user.is_anonymous() %}<th> Primary Field </th> {%endif%}
+        {%if current_user.sourceTitle or current_user.is_anonymous() %} <th> Source Title </th> {%endif%}
+        {%if current_user.editor or current_user.is_anonymous() %} <th> Editor </th> {%endif%}
+        {%if current_user.yearPublished or current_user.is_anonymous() %} <th> Year Published </th> {%endif%}
+        {%if current_user.refType or current_user.is_anonymous() %} <th> Type </th> {%endif%}
+        {%if current_user.creator%} <th> Creator </th> {%endif%}
+        {%if current_user.dateCreatedOn or current_user.is_anonymous() %} <th> Date Created </th> {%endif%}
+        {%if current_user.lastModified or current_user.is_anonymous() %} <th> Last Modified </th> {%endif%}
+        {%if current_user.lastModifiedBy%} <th> Last Modified By </th> {%endif%}
       </tr>
  	</thread> 	
     <tbody>
@@ -43,17 +45,17 @@
     {% for l in lit %}
 
     	<tr>
-    		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
-    		<td>{{l.author}}</td>
-        <td>{{l.primaryField}}</td>
-    		<td>{{l.sourceTitle}}</td>
-        <td>{{l.editor}}</td>    
-        <td>{{l.yearPublished}}</td>
-        <td>{{l.refType}}</td>    
-        <td>{{l.creator}}</td>
-        <td>{{l.created_date}}</td>
-        <td>{{l.last_edit.date}}</td>
-        <td>{{l.last_edit.lastUserEdited}}</td>
+    		{%if current_user.title or current_user.is_anonymous() %} <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> {%endif%}
+    		{%if current_user.author or current_user.is_anonymous() %}<td>{{l.author}}</td> {%endif%}
+        {%if current_user.primaryField or current_user.is_anonymous() %}<td>{{l.primaryField}}</td> {%endif%}
+    		{%if current_user.sourceTitle or current_user.is_anonymous() %}<td>{{l.sourceTitle}}</td> {%endif%}
+        {%if current_user.editor or current_user.is_anonymous() %}<td>{{l.editor}}</td> {%endif%}    
+        {%if current_user.yearPublished or current_user.is_anonymous() %}<td>{{l.yearPublished}}</td> {%endif%}
+        {%if current_user.refType or current_user.is_anonymous() %} <td>{{l.refType}}</td> {%endif%}    
+        {%if current_user.creator%}<td>{{l.creator}}</td> {%endif%}
+        {%if current_user.dateCreatedOn or current_user.is_anonymous() %}<td>{{l.created_date}}</td> {%endif%}
+        {%if current_user.lastModified or current_user.is_anonymous() %}<td>{{l.last_edit.date}}</td> {%endif%}
+        {%if current_user.lastModifiedBy%}<td>{{l.last_edit.lastUserEdited}}</td> {%endif%}
     	</tr>
     {% endfor %}
     </tbody>
@@ -62,8 +64,6 @@
 
 <br>
 <br>
-
-{{ wtf.quick_form(form) }}
  
 <!--  <br> 
 
@@ -85,6 +85,10 @@
  Go here instead.
  </a>
 </p>
+
+<link rel="stylesheet" href="jquery-ui-themes-1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="jquery-1.10.1.js"></script>
+<script src="jquery-ui.js"></script><script src="jquery-1.9.1.min.js"></script>
 
 {% endblock %}
 
