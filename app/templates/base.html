@@ -3,8 +3,12 @@
 {% block title %}OBET{% endblock %}
 
 {% block navbar %}
+
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
 <div style = "margin-bottom: 60px">
-<div class="navbar navbar-inverse" role="navigation">
+<div id="menu" class="navbar navbar-inverse navbar-custom" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -13,12 +17,21 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">OBET</a>
+            <a class="navbar-brand " href="{{ url_for('main.index') }}">OBET</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-                <li><a href="{{ url_for('main.search') }}">Search</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Info 
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('main.about') }}">About</a></li>
+                        <li><a href="{{ url_for('main.history') }}">History</a></li>
+                        <li><a href="{{ url_for('main.manual') }}">Manuals and Instructions</a></li>
+                    </ul>
+                </li>
+                <li><a href="{{ url_for('main.search') }}">Home</a></li>
+                <li><a href="{{ url_for('main.search') }}">Browse</a></li>
                 {% if current_user.is_authenticated() %}
                 <li><a href="{{ url_for('main.user', email = current_user.email) }}">Profile</a></li>
                 {% endif %}
@@ -26,9 +39,8 @@
 
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.can(Permission.ADDLIT) or current_user.can(Permission.ADMINISTER) %}
-                <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Lit</a></li>
+                <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Material</a></li>
                 	{% if current_user.can(Permission.ADMINISTER) %}
-                	<li><a href="{{ url_for('main.deleteLit', name = current_user.name) }}">Delete Lit</a></li>
                 	<li><a href="{{ url_for('main.deleteUser', name = current_user.name) }}">Delete User</a></li>
                 	{% endif %}
                 {% endif %}

@@ -1,71 +1,234 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Search For Literature{% endblock %}
+{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
+{% block title %}OBET - Search For Literature{% endblock %} 
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+{% endblock %}
+
 {% block page_content %}
+  <!-- main area -->
+  <script>
+    {% if not lit %}
+      {% set litRefine = [] %}
+    {% else %}
+      {% set litRefine = lit %}
+    {% endif %}
 
-<head>
+    var lit = {{ litRefine|tojson|safe }};
 
-</head> 
+    function refined() {
 
-<div class="page-header">
- <h1>Search For Literature</h1>	
-</div>
+      // alert("hello from here!");
 
-<meta id="searchString" data-name="{{searchString}}">
-<meta id="sortString" data-name="{{sortString}}">
+      // Form element
+      var searchOptions = document.getElementById('searchoptions');
+      // All literature items
+      var checkboxes = document.getElementsByName('literature');
 
-{% if searchTerm %}
-  {% set searchString = searchTerm %}
-{% endif %}
+      var n = checkboxes.length;
+      var redefined = [];
+      var count = 0;
+      var found;
 
-{{ wtf.quick_form(form) }}
+      // Search through the list of checked items and save the lit objects into array
+      if( lit != null ) {
+        for(var i=0; i<n; i++) {
+          if(checkboxes[i].checked) {
+            found = searchList(checkboxes[i].value);
+            if( found != null){
+              redefined[count] = found;
+              count++;
+            }
+          }
+        }
 
-<div class="container">
-  <h2>Results</h2>
-  <p>References that match your search query:</p>   
+        // Store the original search and the new list of lit
+        var redefinedString = JSON.stringify(redefined);
+        var query = document.getElementById("search").value;
+        var sortStr = document.getElementById("sort").value;
 
-<table class="table" >  
-    <thead>
-      <tr>
-		    {%if current_user.title or current_user.is_anonymous() %} <th> Title </th> {%endif%}
-      	{%if current_user.author or current_user.is_anonymous() %} <th> Author </th> {%endif%}
-        {%if current_user.primaryField or current_user.is_anonymous() %}<th> Primary Field </th> {%endif%}
-        {%if current_user.sourceTitle or current_user.is_anonymous() %} <th> Source Title </th> {%endif%}
-        {%if current_user.editor or current_user.is_anonymous() %} <th> Editor </th> {%endif%}
-        {%if current_user.yearPublished or current_user.is_anonymous() %} <th> Year Published </th> {%endif%}
-        {%if current_user.refType or current_user.is_anonymous() %} <th> Type </th> {%endif%}
-        {%if current_user.creator%} <th> Creator </th> {%endif%}
-        {%if current_user.dateCreatedOn or current_user.is_anonymous() %} <th> Date Created </th> {%endif%}
-        {%if current_user.lastModified or current_user.is_anonymous() %} <th> Last Modified </th> {%endif%}
-        {%if current_user.lastModifiedBy%} <th> Last Modified By </th> {%endif%}
-      </tr>
- 	</thread> 	
-    <tbody>
+        // Delete previously appended hidden input elements
+        var par = $("#queryString");
+        if(par != null){
+          // alert("found qyert string");
+          $(par).remove();
+        }
+        var redefpar = $("#redefinedString");
+        if(redefpar!=null){
+          $(redefpar).remove();
+          // alert("found redef string");
+        }
+        var sort = $("#sortStr");
+        if(sort!=null){
+          $(sort).remove();
+        }
 
-    {% for l in lit %}
+        // Add current search term in request
+        var querystr = document.createElement("input");
+        querystr.setAttribute("id", "queryString");
+        querystr.setAttribute("type", "hidden");
+        querystr.setAttribute("name", "queryString");
+        querystr.setAttribute("value", query);
+        searchOptions.appendChild(querystr);
 
-    	<tr>
-    		{%if current_user.title or current_user.is_anonymous() %} <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> {%endif%}
-    		{%if current_user.author or current_user.is_anonymous() %}<td>{{l.author}}</td> {%endif%}
-        {%if current_user.primaryField or current_user.is_anonymous() %}<td>{{l.primaryField}}</td> {%endif%}
-    		{%if current_user.sourceTitle or current_user.is_anonymous() %}<td>{{l.sourceTitle}}</td> {%endif%}
-        {%if current_user.editor or current_user.is_anonymous() %}<td>{{l.editor}}</td> {%endif%}    
-        {%if current_user.yearPublished or current_user.is_anonymous() %}<td>{{l.yearPublished}}</td> {%endif%}
-        {%if current_user.refType or current_user.is_anonymous() %} <td>{{l.refType}}</td> {%endif%}    
-        {%if current_user.creator%}<td>{{l.creator}}</td> {%endif%}
-        {%if current_user.dateCreatedOn or current_user.is_anonymous() %}<td>{{l.created_date}}</td> {%endif%}
-        {%if current_user.lastModified or current_user.is_anonymous() %}<td>{{l.last_edit.date}}</td> {%endif%}
-        {%if current_user.lastModifiedBy%}<td>{{l.last_edit.lastUserEdited}}</td> {%endif%}
-    	</tr>
-    {% endfor %}
-    </tbody>
-</table>
-</div>
+        // Add object in request
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("id", "redefinedString");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "redefinedString");
+        hiddenField.setAttribute("value", redefinedString);
+        searchOptions.appendChild(hiddenField);
 
-<br>
-<br>
- 
-<!--  <br> 
+        // Add object in request
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("id", "sortStr");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "sortStr");
+        hiddenField.setAttribute("value", sortStr);
+        searchOptions.appendChild(hiddenField);
+      }  
+    }
+
+    // Search through current "lit" list for those checked off
+    function searchList(id){
+      // alert(id);
+      for (var i = 0; i < lit.length; i++){
+        if(lit[i].id == id){
+          // alert("found this " + lit[i].id);
+          return lit[i];
+        }
+      }
+      return null;
+    }
+
+    function printDiv(divName){
+      // var printContents = document.getElementById(divName).innerHTML;
+      // var originalContents = document.body.innerHTML;
+
+      // document.body.innerHTML = printContents;
+      window.print();
+      // document.body.innerHTML = originalContents;
+    }
+
+  </script>
+
+<!--   {% block javascript %}
+    <script type="text/javascript" src="scripts/refine.js"/>
+  {% endblock %} -->
+
+  <div class="navbar navbar-default ">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+          data-target=".navbar-collapse">
+          <span class="icon-bar"></span> <span class="icon-bar"></span> <span
+            class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse">
+
+      <form id="searchoptions" onsubmit="refined()" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
+        <ul class="nav navbar-nav">
+          <li><input class="btn" type="submit" name="submit" value="RefineView" /></li>
+          <li><button class="btn" type="button"> Export to PDF </button></li>
+          <li><button class="btn" type="button" onclick="printDiv('printableArea');"> Print </button></li>
+        </ul>
+      </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-9 col-md-8">
+    <div class="page-header">
+      <h1>Search For Literature</h1>
+    </div>
+
+    {{ wtf.quick_form(form) }} <br><br>
+
+    <div class="container">
+      <h2>Results</h2>
+      <p>References that match your search query:</p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th> 
+            {%if current_user.title or current_user.is_anonymous() %} 
+              <th>Title</th> 
+            {%endif%} 
+            {%if current_user.author or current_user.is_anonymous() %}
+              <th>Author</th> {%endif%} 
+            {%if current_user.primaryField or current_user.is_anonymous() %}
+              <th>Primary Field</th> {%endif%} 
+            {%if current_user.sourceTitle or current_user.is_anonymous() %}
+              <th>Source Title</th> {%endif%} 
+            {%if current_user.editor or current_user.is_anonymous() %}
+              <th>Editor</th> {%endif%} 
+            {%if current_user.yearPublished or current_user.is_anonymous() %}
+              <th>Year Published</th> {%endif%} 
+            {%if current_user.refType or current_user.is_anonymous() %}
+              <th>Type</th> {%endif%} 
+            {%if current_user.creator%}
+              <th>Creator</th> {%endif%} 
+            {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+              <th>Date Created</th> {%endif%} 
+            {%if current_user.lastModified or current_user.is_anonymous() %}
+              <th>Last Modified</th> {%endif%} 
+            {%if current_user.lastModifiedBy%}
+              <th>Last Modified By</th> {%endif%}
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for l in lit %}
+            <tr>
+              <td>
+                <input type="checkbox" id="id_{{l.id}}" name="literature"
+                value="{{l.id}}">
+              </td> 
+              {%if current_user.title or current_user.is_anonymous() %}
+                <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+              {%endif%} 
+              {%if current_user.author or current_user.is_anonymous() %}
+                <td>{{l.author}}</td> 
+              {%endif%} 
+              {%if current_user.primaryField or current_user.is_anonymous() %}
+                <td>{{l.primaryField}}</td> 
+              {%endif%} 
+              {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                <td>{{l.sourceTitle}}</td> 
+              {%endif%} 
+              {%if current_user.editor or current_user.is_anonymous() %}
+                <td>{{l.editor}}</td> 
+              {%endif%} 
+              {%if current_user.yearPublished or current_user.is_anonymous() %}
+                <td>{{l.yrPublished|string()}}</td> 
+              {%endif%} 
+              {%if current_user.refType or current_user.is_anonymous() %}
+                <td>{{l.refType}}</td> 
+              {%endif%} 
+              {%if current_user.creator%}
+                <td>{{l.creator}}</td> 
+              {%endif%} 
+              {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+                <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
+              {%endif%} 
+              {%if current_user.lastModified or current_user.is_anonymous() %}
+                <td>{{l.last_edit.date}}</td> 
+              {%endif%} 
+              {%if current_user.lastModifiedBy%}
+                <td>{{l.last_edit.lastUserEdited}}</td> 
+              {%endif%}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <br> <br>
+
+    <!--  <br> 
 
 <form id="sort" action="{{ url_for('main.search', searchStr = searchString) }}">
   Sort By:
@@ -78,18 +241,11 @@
 
 </form> <button type="submit" form="sort" value="Sort"> Sort </button> -->
 
- <p>
- <br>
- Rather do an explicit search?
- <a href="{{ url_for('main.exactSearch') }}">
- Go here instead.
- </a>
-</p>
-
-<link rel="stylesheet" href="jquery-ui-themes-1.10.3/themes/smoothness/jquery-ui.css" />
-<script src="jquery-1.10.1.js"></script>
-<script src="jquery-ui.js"></script><script src="jquery-1.9.1.min.js"></script>
-
+    <p>
+      <br> Rather do an explicit search? <a
+        href="{{ url_for('main.exactSearch') }}"> Go here instead. </a>
+    </p>
+  </div>
 {% endblock %}
 
 

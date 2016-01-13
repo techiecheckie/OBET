@@ -1,43 +1,126 @@
 from datetime import datetime
-from flask import render_template, session, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from . import main
 from .forms import SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from flask.ext.login import login_required, current_user
+import json
 
 #######################
 # To be deleted later #
 #######################
 @main.route('/', methods=['GET', 'POST'])
 def index():
- 	return render_template('index.html', current_time = datetime.utcnow())
+ 	return redirect(url_for('main.search'))
 
+
+###############
+# Information #
+###############
+@main.route('/about', methods=["GET"])
+def about():
+	return render_template('about.html')
+	
+@main.route('/history', methods=["GET"])
+def history():
+	return render_template('history.html')
+
+@main.route('/manual', methods=['GET'])
+def manual():
+	return render_template('manAndInst.html')
 
 ##################
 # Fuzzy Search
 ##################
 
+def litToJson(lit):
+	# Create a json string of lit
+	jsonlit = '['
+	for literature in iter(lit):
+		jsonlit+= ( literature.to_json() + ", ")
+	if len(jsonlit) > 7:
+		jsonlit = jsonlit[:-2]
+	jsonlit += "]"	
+	return jsonlit
+
+def convertId(lit):
+	for l in lit:
+		# Convert id to basic string id
+		litid = "%s" % l["_id"]	
+		litid = litid.replace("{u'$oid': u'", "")
+		litid = litid.replace("'}", "")
+		l["id"] = litid
+
+		# Convert date to basic date
+		litdate = "%s" % l["created_date"]
+		litdate = litdate.replace("{u'$date': ", "")
+		litdate = litdate.replace("L", "")
+		litdate = int(litdate.replace("}", ""))
+		litdate = litdate/1000.0
+		litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S.%f'))
+		# print litdate
+		l["created_date"] = litdate
+
+		# Convert date to basic date
+		litdate = "%s" % l["last_edit"]["date"]
+		litdate = litdate.replace("{u'$date': ", "")
+		litdate = litdate.replace("L", "")
+		litdate = int(litdate.replace("}", ""))
+		litdate = litdate/1000.0
+		litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S.%f'))
+		# print "lastedit " + litdate
+		l["last_edit"]["date"] = litdate
+
+	return lit
+
 @main.route('/search', methods=['GET', 'POST'])
 def search():
  form = SearchForm()
- if form.validate_on_submit():
- 	print 'form is validated'
- 	queryString = str(form.search.data)
- 	lit = Lit.objects.search_text(queryString).order_by('$text_score')
- 	if len(lit) == 0:
- 			flash("Your search returned nothing. Try other search terms.")
- 	else:
- 		sortStr = str(form.sort.data)
- 		# if sortStr == 'last_editdate' or sortStr == 'last_edituser':
- 		# 	print 'trying to sort by embedded doc'
- 		# 	lit = sorted(lit, key=lambda lit: getattr(getattr(lit, 'last_edit'), 'date'))
- 		# 	# lit = sorted(lit, key=lambda lit: getattr(lit,'l_edit_record'))
+ if request.method == 'POST':
+ 	 # If the request is to refine view
+	 if request.form['submit']=='RefineView':
+	 
+	 	 # Display all values in request for debugging purposed
+	 	 f = request.form
+		 for key in f.keys():
+			for value in f.getlist(key):
+				print key,":",value
 
- 		# else:
- 		lit = sorted(lit, key=lambda lit: getattr(lit, sortStr))
- 		return render_template('search.html', form = form, lit = lit)
- 	return redirect(url_for('main.search'))
+		 # Set search term to original search term
+	 	 if 'queryString' in request.form:
+		 	form.search.data = request.form['queryString']
+		 if 'sortStr' in request.form:
+		 	form.sort.data = request.form['sortStr']
+
+		 formString = request.form['redefinedString']
+		 if formString:
+		 	lit = json.loads(formString)
+		 # 	# Convert lit to appropiate list object
+			# lit = convertId(lit)
+		 else:
+		 	lit = none
+
+		 return render_template('search.html', form = form, lit = lit)
+	 # If the request is to search
+	 elif form.validate_on_submit():
+	 	queryString = str(form.search.data)
+	 	lit = Lit.objects.search_text(queryString).order_by('$text_score')
+
+	 	if len(lit) == 0:
+	 		flash("Your search returned nothing. Try other search terms.")
+			return render_template('search.html', form = form, lit = lit)
+
+		else:
+			# Sort lit
+			sortStr = str(form.sort.data)
+			lit = sorted(lit, key=lambda lit: getattr(lit, sortStr))
+
+			# Convert lit to appropiate list object
+			jsonlit = litToJson(lit)
+			lit = json.loads(jsonlit)
+			lit = convertId(lit)
+			return render_template('search.html', form = form, lit = lit)
  return render_template('search.html', form = form)
 
 ###############
@@ -86,7 +169,6 @@ def exactSearch():
  	return redirect(url_for('main.exactSearch'))
  # If the form doesn't validate at all, rerender
  return render_template('exactSearch.html', form = form)
-
 
 #####################
 # User Profile Page #
@@ -263,13 +345,13 @@ def updateLitSub(lit_id):
 ################
 # Edit Profile #
 ################
-## Need to add the update into this.
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
  	form = EditProfileForm()
  	if form.validate_on_submit():
  		current_user.update(set__name=form.name.data)
+ 		current_user.update(set__location=form.location.data)
  		current_user.update(set__credentials = form.credentials.data)
  		current_user.update(set__description = form.description.data)
  		current_user.update(set__title = form.title.data)
@@ -286,6 +368,7 @@ def edit_profile():
  		flash('Your profile has been updated.')
  		return redirect(url_for('.user', email = current_user.email))
  	form.name.data = current_user.name
+ 	form.location.data = current_user.location
  	form.credentials.data = current_user.credentials
  	form.description.data = current_user.description
  	form.title.data = current_user.title
@@ -303,6 +386,7 @@ def edit_profile():
 #################################
 # Delete Lit Main Page Function #
 #################################
+# Get rid of?
 
 from ..decorators import admin_required, permission_required, user_required
 @main.route('/deleteLit', methods=['GET', 'POST'])

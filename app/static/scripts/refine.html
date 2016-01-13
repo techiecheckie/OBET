@@ -1,0 +1,50 @@
+<script type="text/javascript">
+  var lit = {{litRefine|tojson|safe}};
+
+  function refined() {
+
+    alert("hello from here!");
+
+    var searchOptions = document.getElementById('searchoptions');
+    var checkboxes = document.getElementsByName('literature');
+
+    var n = checkboxes.length;
+    var redefined = [];
+    var count = 0;
+    var found;
+
+    alert(JSON.stringify(lit));
+
+    if( lit != null ) {
+      alert("lit not null " + JSON.stringify(lit));
+      for(var i=0; i<n; i++) {
+        if(checkboxes[i].checked) {
+          found = searchList(checkboxes[i].value);
+          if( found != null){
+            redefined[count] = found;
+            count++;
+          }
+        }
+      }
+
+      var redefinedString = JSON.stringify(redefined);
+      alert(redefinedString);
+
+      var hiddenField = document.createElement("input");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", "redefinedString");
+      hiddenField.setAttribute("value", redefinedString);
+      searchOptions.appendChild(hiddenField);
+    }  
+  }
+
+  function searchList(id){
+    alert("from search List");
+    for (var i = 0; i < lit.length; i++){
+      if(lit[i]._id.$oid == id){
+        return lit[i];
+      }
+    }
+    return null;
+  }
+</script>
