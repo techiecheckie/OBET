@@ -2,16 +2,47 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}OBET{% endblock %}
 {% block page_content %}
-<div class="page-header">
- 	
-<h1>Hello,
-{% if current_user.is_authenticated() %}
- {{ current_user.name }}!
-{% else %}
- Stranger!
-{% endif %}</h1>
+	<div class="centered-search"><img src="../static/obetsearchbox.png" class="img-responsive" alt="search_box"></div>
 
-</div>
+	<br>
+
+	    <!-- {{ wtf.quick_form(form, action="{{url_for('main.search')}}") }}  -->
+
+	<div class="row">
+	    <div class="input-group input-group-lg">
+	      <input id="query" type="text" class="form-control" placeholder="ie Rachel Carson">
+	      <span class="input-group-btn">
+	        <button class="btn btn-default search-btn" type="button" onclick="submitform()">Search</button>
+	      </span>
+	    </div>
+	</div>
+
+	<p class="centered-advanced-search">
+	  <br> Rather do an <a href="{{ url_for('main.exactSearch') }}"> Advanced Search?
+	    Go here instead. </a>
+	</p>
+
+	<form id="searchForm" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="submitBtn" value="main"/>
+	</form> 
+
+	<script>
+		function submitform(){ 
+			console.log("submitting form1");    
+			var searchform = document.getElementById('searchForm'); 
+
+			// Add object in request
+	        var hiddenField = document.createElement("input");
+	        hiddenField.setAttribute("id", "query");
+	        hiddenField.setAttribute("type", "hidden");
+	        hiddenField.setAttribute("name", "query");
+	        hiddenField.setAttribute("value", document.getElementById('query').value);
+	        searchform.appendChild(hiddenField);
+
+			document.getElementById("searchForm").submit();
+		}
+	</script>
+
 {% endblock %}
 
 

@@ -7,6 +7,10 @@ from wtforms import widgets
 from ..models import User, Lit, Role
 from wtforms.fields.html5 import EmailField
 
+class SearchFormMain(Form):
+    search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
+    submit = SubmitField('Search')
+    
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
         sort = SelectField('Sort by: ', choices = [('author', 'Author/Editor'), ('created_date', 'Date Created'), ('creator', 'Creator'), ('primaryField', 'Primary Field'), ('title', 'Title')])

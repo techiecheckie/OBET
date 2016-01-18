@@ -30,7 +30,7 @@
                         <li><a href="{{ url_for('main.manual') }}">Manuals and Instructions</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ url_for('main.search') }}">Home</a></li>
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li><a href="{{ url_for('main.search') }}">Browse</a></li>
                 {% if current_user.is_authenticated() %}
                 <li><a href="{{ url_for('main.user', email = current_user.email) }}">Profile</a></li>

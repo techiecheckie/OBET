@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, request
 from . import main
-from .forms import SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
+from .forms import SearchFormMain, SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from flask.ext.login import login_required, current_user
@@ -12,7 +12,8 @@ import json
 #######################
 @main.route('/', methods=['GET', 'POST'])
 def index():
- 	return redirect(url_for('main.search'))
+	form = SearchFormMain()
+ 	return render_template('index.html', form = form)
 
 
 ###############
@@ -74,53 +75,84 @@ def convertId(lit):
 
 	return lit
 
+def fuzzySearch(request):
+ 	form = SearchForm()
+ 	queryString = request['query']
+ 	form.search.data = queryString
+ 	lit = Lit.objects.search_text(queryString).order_by('$text_score')
+  	if len(lit) == 0:
+ 		flash("Your search returned nothing. Try other search terms.")
+		return render_template('search.html', form = form, lit = lit)
+	else:
+		# Sort lit
+		sortStr = 'title'
+		form.sort.data = sortStr
+		lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
+
+		# Convert lit to appropiate list object
+		jsonlit = litToJson(lit)
+		lit = json.loads(jsonlit)
+		lit = convertId(lit)
+		return render_template('search.html', form = form, lit = lit)
+
+def refineView(request):
+ 	form = SearchForm()
+ 	
+ 	# Display all values in request for debugging purposed
+ 	f = request
+	for key in f.keys():
+		for value in f.getlist(key):
+			print key,":",value
+
+	# Set search term to original search term
+	form.search.data = request['queryString']
+	form.sort.data = request['sortStr']
+
+	formString = request['redefinedString']
+	if formString:
+	 	lit = json.loads(formString)
+	else:
+	 	lit = none
+	return render_template('search.html', form = form, lit = lit)
+
+def searchForm(request):
+ 	form = SearchForm()
+ 	if request.search.data:
+ 		queryString = str(request.search.data)
+ 	lit = Lit.objects.search_text(queryString).order_by('$text_score')
+
+ 	if len(lit) == 0:
+ 		flash("Your search returned nothing. Try other search terms.")
+		return render_template('search.html', form = form, lit = lit)
+
+	else:
+		# Sort lit
+		if request.sort.data:
+			sortStr = str(request.sort.data)
+		else:
+			sortStr = 'title'
+		lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
+
+		# Convert lit to appropiate list object
+		jsonlit = litToJson(lit)
+		lit = json.loads(jsonlit)
+		lit = convertId(lit)
+		return render_template('search.html', form = form, lit = lit)
+
 @main.route('/search', methods=['GET', 'POST'])
 def search():
- form = SearchForm()
+ form = SearchForm()	
  if request.method == 'POST':
- 	 # If the request is to refine view
-	 if request.form['submit']=='RefineView':
-	 
-	 	 # Display all values in request for debugging purposed
-	 	 f = request.form
-		 for key in f.keys():
-			for value in f.getlist(key):
-				print key,":",value
-
-		 # Set search term to original search term
-	 	 if 'queryString' in request.form:
-		 	form.search.data = request.form['queryString']
-		 if 'sortStr' in request.form:
-		 	form.sort.data = request.form['sortStr']
-
-		 formString = request.form['redefinedString']
-		 if formString:
-		 	lit = json.loads(formString)
-		 # 	# Convert lit to appropiate list object
-			# lit = convertId(lit)
-		 else:
-		 	lit = none
-
-		 return render_template('search.html', form = form, lit = lit)
 	 # If the request is to search
-	 elif form.validate_on_submit():
-	 	queryString = str(form.search.data)
-	 	lit = Lit.objects.search_text(queryString).order_by('$text_score')
+	 if form.validate_on_submit():
+	 	return searchForm(form)
+	 # If the request is from the main page
+	 elif request.form['submitBtn']=='main':
+	 	return fuzzySearch(request.form)
+ 	 # If the request is to refine view
+	 elif request.form['submitBtn']=='RefineView':
+		return refineView(request.form)
 
-	 	if len(lit) == 0:
-	 		flash("Your search returned nothing. Try other search terms.")
-			return render_template('search.html', form = form, lit = lit)
-
-		else:
-			# Sort lit
-			sortStr = str(form.sort.data)
-			lit = sorted(lit, key=lambda lit: getattr(lit, sortStr))
-
-			# Convert lit to appropiate list object
-			jsonlit = litToJson(lit)
-			lit = json.loads(jsonlit)
-			lit = convertId(lit)
-			return render_template('search.html', form = form, lit = lit)
  return render_template('search.html', form = form)
 
 ###############

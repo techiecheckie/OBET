@@ -129,9 +129,8 @@
 
       <form id="searchoptions" onsubmit="refined()" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
         <ul class="nav navbar-nav">
-          <li><input class="btn" type="submit" name="submit" value="RefineView" /></li>
-          <li><button class="btn" type="button"> Export to PDF </button></li>
-          <li><button class="btn" type="button" onclick="printDiv('printableArea');"> Print </button></li>
+          <li><input class="btn search-nav" type="submit" name="submitBtn" value="RefineView" /></li>
+          <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
         </ul>
       </form>
 
@@ -146,85 +145,87 @@
 
     {{ wtf.quick_form(form) }} <br><br>
 
-    <div class="container">
-      <h2>Results</h2>
-      <p>References that match your search query:</p>
+    {% if lit %}
+      <div class="container">
+        <h2>Results</h2>
+        <p>References that match your search query:</p>
 
-      <table class="table">
-        <thead>
-          <tr>
-            <th></th> 
-            {%if current_user.title or current_user.is_anonymous() %} 
-              <th>Title</th> 
-            {%endif%} 
-            {%if current_user.author or current_user.is_anonymous() %}
-              <th>Author</th> {%endif%} 
-            {%if current_user.primaryField or current_user.is_anonymous() %}
-              <th>Primary Field</th> {%endif%} 
-            {%if current_user.sourceTitle or current_user.is_anonymous() %}
-              <th>Source Title</th> {%endif%} 
-            {%if current_user.editor or current_user.is_anonymous() %}
-              <th>Editor</th> {%endif%} 
-            {%if current_user.yearPublished or current_user.is_anonymous() %}
-              <th>Year Published</th> {%endif%} 
-            {%if current_user.refType or current_user.is_anonymous() %}
-              <th>Type</th> {%endif%} 
-            {%if current_user.creator%}
-              <th>Creator</th> {%endif%} 
-            {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
-              <th>Date Created</th> {%endif%} 
-            {%if current_user.lastModified or current_user.is_anonymous() %}
-              <th>Last Modified</th> {%endif%} 
-            {%if current_user.lastModifiedBy%}
-              <th>Last Modified By</th> {%endif%}
-          </tr>
-        </thead>
-
-        <tbody>
-          {% for l in lit %}
+        <table class="table">
+          <thead>
             <tr>
-              <td>
-                <input type="checkbox" id="id_{{l.id}}" name="literature"
-                value="{{l.id}}">
-              </td> 
-              {%if current_user.title or current_user.is_anonymous() %}
-                <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+              <th></th> 
+              {%if current_user.title or current_user.is_anonymous() %} 
+                <th>Title</th> 
               {%endif%} 
               {%if current_user.author or current_user.is_anonymous() %}
-                <td>{{l.author}}</td> 
-              {%endif%} 
+                <th>Author</th> {%endif%} 
               {%if current_user.primaryField or current_user.is_anonymous() %}
-                <td>{{l.primaryField}}</td> 
-              {%endif%} 
+                <th>Primary Field</th> {%endif%} 
               {%if current_user.sourceTitle or current_user.is_anonymous() %}
-                <td>{{l.sourceTitle}}</td> 
-              {%endif%} 
+                <th>Source Title</th> {%endif%} 
               {%if current_user.editor or current_user.is_anonymous() %}
-                <td>{{l.editor}}</td> 
-              {%endif%} 
+                <th>Editor</th> {%endif%} 
               {%if current_user.yearPublished or current_user.is_anonymous() %}
-                <td>{{l.yrPublished|string()}}</td> 
-              {%endif%} 
+                <th>Year Published</th> {%endif%} 
               {%if current_user.refType or current_user.is_anonymous() %}
-                <td>{{l.refType}}</td> 
-              {%endif%} 
+                <th>Type</th> {%endif%} 
               {%if current_user.creator%}
-                <td>{{l.creator}}</td> 
-              {%endif%} 
+                <th>Creator</th> {%endif%} 
               {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
-                <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
-              {%endif%} 
+                <th>Date Created</th> {%endif%} 
               {%if current_user.lastModified or current_user.is_anonymous() %}
-                <td>{{l.last_edit.date}}</td> 
-              {%endif%} 
+                <th>Last Modified</th> {%endif%} 
               {%if current_user.lastModifiedBy%}
-                <td>{{l.last_edit.lastUserEdited}}</td> 
-              {%endif%}
+                <th>Last Modified By</th> {%endif%}
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+
+          <tbody>
+            {% for l in lit %}
+              <tr>
+                <td>
+                  <input type="checkbox" id="id_{{l.id}}" name="literature"
+                  value="{{l.id}}">
+                </td> 
+                {%if current_user.title or current_user.is_anonymous() %}
+                  <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+                {%endif%} 
+                {%if current_user.author or current_user.is_anonymous() %}
+                  <td>{{l.author}}</td> 
+                {%endif%} 
+                {%if current_user.primaryField or current_user.is_anonymous() %}
+                  <td>{{l.primaryField}}</td> 
+                {%endif%} 
+                {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                  <td>{{l.sourceTitle}}</td> 
+                {%endif%} 
+                {%if current_user.editor or current_user.is_anonymous() %}
+                  <td>{{l.editor}}</td> 
+                {%endif%} 
+                {%if current_user.yearPublished or current_user.is_anonymous() %}
+                  <td>{{l.yrPublished|string()}}</td> 
+                {%endif%} 
+                {%if current_user.refType or current_user.is_anonymous() %}
+                  <td>{{l.refType}}</td> 
+                {%endif%} 
+                {%if current_user.creator%}
+                  <td>{{l.creator}}</td> 
+                {%endif%} 
+                {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+                  <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
+                {%endif%} 
+                {%if current_user.lastModified or current_user.is_anonymous() %}
+                  <td>{{l.last_edit.date}}</td> 
+                {%endif%} 
+                {%if current_user.lastModifiedBy%}
+                  <td>{{l.last_edit.lastUserEdited}}</td> 
+                {%endif%}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
 
     <br> <br>
 
@@ -242,8 +243,8 @@
 </form> <button type="submit" form="sort" value="Sort"> Sort </button> -->
 
     <p>
-      <br> Rather do an explicit search? <a
-        href="{{ url_for('main.exactSearch') }}"> Go here instead. </a>
+      <br> Rather do an <a href="{{ url_for('main.exactSearch') }}"> Advanced Search?
+        Go here instead. </a>
     </p>
   </div>
 {% endblock %}
