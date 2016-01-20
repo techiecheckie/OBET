@@ -17,7 +17,7 @@ class SearchForm(Form):
         # add reverse option
         submit = SubmitField('Search')
     	
-class ExactSearchForm(Form):
+class AdvancedSearchForm(Form):
     	refType = SelectField('Reference Type', choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),
         ('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')], default = None)
 	title = StringField('Title', default = None)

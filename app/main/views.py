@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, request
 from . import main
-from .forms import SearchFormMain, SearchForm, ExactSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
+from .forms import SearchFormMain, SearchForm, AdvancedSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from flask.ext.login import login_required, current_user
@@ -79,6 +79,10 @@ def fuzzySearch(request):
  	form = SearchForm()
  	queryString = request['query']
  	form.search.data = queryString
+ 	if(queryString == ''):
+ 		flash("Your search returned nothing. Try other search terms.")
+		return render_template('search.html', form = form, lit = None)
+
  	lit = Lit.objects.search_text(queryString).order_by('$text_score')
   	if len(lit) == 0:
  		flash("Your search returned nothing. Try other search terms.")
@@ -155,52 +159,89 @@ def search():
 
  return render_template('search.html', form = form)
 
-###############
+###################
 # Strict Search
 ###################
 
-@main.route('/exactSearch', methods=['GET', 'POST'])
-def exactSearch():
- form = ExactSearchForm()
- if form.validate_on_submit():
+@main.route('/advancedSearch', methods=['GET', 'POST'])
+def advancedSearch():
+	pass
+	# DONT FORGET TO ESCAPE ANY SPECIAL CHARACTERS
+	# if request.method == 'POST':
+	# 	print json.dumps(request.form)
+	# 	# print request.form['count']
+
+	# 	# get number of conditions
+	# 	count = int(request.form['count'])
+
+	# 	# string to contain the mongo query
+	# 	query = 'Lit.objects.('
+
+	# 	# fields of each 
+	# 	cond = 'condition1'
+	# 	category = 'category1'
+	# 	contains = 'contains1'
+	# 	inputtext = 'inputtext1'
+
+	# 	# go through all the conditions and add the information to 
+	# 	for x in xrange(1, count+1):
+	# 		condx = str.replace(cond, '1', str(x))
+	# 		categoryx = str.replace(category, '1', str(x))
+	# 		containsx = str.replace(contains, '1', str(x))
+	# 		inputtextx = str.replace(inputtext, '1', str(x))
+	# 		# check if the condition is ignore
+	# 		if( request.form[condx] != 'ignore' ):
+	# 			# print "This is the request " + request.form[condx] + " " + condx
+	# 			# if not ignore then add the information to the mongo query
+	# 			# get the information from the 4 input fields
+	# 			if()
+	# 				query.append('')
+
+		# execute the query
+
+		# return the results as lit and the previous request as prevreq
+
+
+ # form = AdvancedSearchForm()
+ # if form.validate_on_submit():
  	
- 	#####
- 	# If there's nothing in the title or author areas, send an error and return.
- 	if len(form.author.data) == 0 and len(form.title.data) == 0:
- 		flash("You must enter something in the title or author sections.")
- 		return redirect(url_for('main.exactSearch'))
+ # 	#####
+ # 	# If there's nothing in the title or author areas, send an error and return.
+ # 	if len(form.author.data) == 0 and len(form.title.data) == 0:
+ # 		flash("You must enter something in the title or author sections.")
+ # 		return redirect(url_for('main.advancedSearch'))
  	
- 	#####
- 	# If only title has data, grab info on that	
- 	if len(form.author.data) == 0 and form.refType.data == 'None':
- 		lit = Lit.objects(title__iexact = form.title.data)
+ # 	#####
+ # 	# If only title has data, grab info on that	
+ # 	if len(form.author.data) == 0 and form.refType.data == 'None':
+ # 		lit = Lit.objects(title__iexact = form.title.data)
  	
- 	#####
- 	# If only author has data, grab info on that	
- 	elif len(form.title.data) == 0 and form.refType.data == 'None':
- 		lit = Lit.objects(author__iexact = form.author.data)
+ # 	#####
+ # 	# If only author has data, grab info on that	
+ # 	elif len(form.title.data) == 0 and form.refType.data == 'None':
+ # 		lit = Lit.objects(author__iexact = form.author.data)
  	
- 	#####
- 	# If both title and author have data, grab info on both
- 	elif form.refType.data == 'None':
- 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data)
+ # 	#####
+ # 	# If both title and author have data, grab info on both
+ # 	elif form.refType.data == 'None':
+ # 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data)
  	
- 	#####
- 	# Otherwise grab everything
- 	else:
- 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data, refType__iexact = form.refType.data)
+ # 	#####
+ # 	# Otherwise grab everything
+ # 	else:
+ # 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data, refType__iexact = form.refType.data)
  	
- 	#####
- 	# If you don't find any matching objects, flash a message
- 	if len(lit) == 0:
- 			flash("Your search returned nothing. Try being less specific.")
- 	# If you do, render them
- 	else:
- 		return render_template('exactSearch.html', form = form, lit = lit)
- 	# Either way, redirect back to this page
- 	return redirect(url_for('main.exactSearch'))
- # If the form doesn't validate at all, rerender
- return render_template('exactSearch.html', form = form)
+ # 	#####
+ # 	# If you don't find any matching objects, flash a message
+ # 	if len(lit) == 0:
+ # 			flash("Your search returned nothing. Try being less specific.")
+ # 	# If you do, render them
+ # 	else:
+ # 		return render_template('advancedSearch.html', form = form, lit = lit)
+ # 	# Either way, redirect back to this page
+ # 	return redirect(url_for('main.advancedSearch'))
+ # # If the form doesn't validate at all, rerender
+ 	return render_template('advancedSearch.html')
 
 #####################
 # User Profile Page #
@@ -299,26 +340,9 @@ def addLit():
 @login_required
 def updateLit(lit_id):
 	lit = Lit.objects(id__iexact = lit_id).first()
-	form = AddLitForm()
+	form = AddLitForm(None, lit)
 	keywordslist = ', '.join(lit.keywords).encode('utf-8')
 
-	# Prepopulate the field with literature object information
-	form.refType.data = lit.refType
-	form.title.data = lit.title
-	form.author.data = lit.author
-	form.yrPublished.data = lit.yrPublished
-	form.sourceTitle.data = lit.sourceTitle
-	form.editor.data = lit.editor
-	form.placePublished.data = lit.placePublished
-	form.publisher.data = lit.publisher
-	form.volume.data = lit.volume
-	form.number.data = lit.number
-	form.pages.data = lit.pages
-	form.abstract.data = lit.abstract
-	form.notes.data = lit.notes
-	form.primaryField.data = lit.primaryField
-	form.secondaryField.data = lit.secondaryField
-	form.link.data = lit.link
 	form.keywords.data = keywordslist
 	return render_template('update.html', form = form, lit = lit)
 
@@ -389,7 +413,6 @@ def edit_profile():
  		current_user.update(set__title = form.title.data)
  		current_user.update(set__author = form.author.data)
  		current_user.update(set__primaryField = form.primaryField.data)
- 		#current_user.update(set__sourceTitle = form.sourceTitle.data)
  		current_user.update(set__editor = form.editor.data)
  		current_user.update(set__yearPublished = form.yearPublished.data)
  		current_user.update(set__refType = form.refType.data)
@@ -399,20 +422,7 @@ def edit_profile():
  		current_user.update(set__lastModifiedBy = form.lastModifiedBy.data)
  		flash('Your profile has been updated.')
  		return redirect(url_for('.user', email = current_user.email))
- 	form.name.data = current_user.name
- 	form.location.data = current_user.location
- 	form.credentials.data = current_user.credentials
- 	form.description.data = current_user.description
- 	form.title.data = current_user.title
- 	form.author.data = current_user.author
- 	form.primaryField.data = current_user.primaryField
- 	form.editor.data = current_user.editor
- 	form.yearPublished.data = current_user.yearPublished
- 	form.refType.data = current_user.refType
- 	form.creator.data = current_user.creator
- 	form.dateCreatedOn.data = current_user.dateCreatedOn
- 	form.lastModified.data = current_user.lastModified
- 	form.lastModifiedBy.data = current_user.lastModifiedBy
+ 	form = EditProfileForm(None, current_user)
  	return render_template('editProfile.html', form=form)
 
 #################################

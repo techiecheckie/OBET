@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}OBET - Advanced Search For Literature{% endblock %}
+{% block page_content %}
+<div class="page-header">
+ <h1>Advanced Search For Literature</h1>	
+</div>
+
+  <div class="container">
+    <form id="advsearch" onsubmit="beforeSubmit()" action="{{url_for('main.advancedSearch')}}" method="POST">
+      <div class="form-inline">
+        <select id="condition1" name="condition1" class="form-control">
+          <option value=""></option>
+          <option value="ignore">Ignore</option>
+        </select>
+        <select id="category1" name="category1" class="form-control" onchange="">
+          <option value="ReferenceType">Reference Type</option>
+          <option value="Author">Author/Editor</option>
+          <option value="Title">Title</option>
+          <option value="Year">Year</option>
+          <option value="SourceTitle">Source Title</option>
+          <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>
+          <option value="PrimarySecondary">Primary/Secondary Fields</option>
+          <option value="DateCreated">Date Created</option>
+          <option value="CreatedBy">Created By</option>
+          <option value="ModifiedBy">Modified By</option>
+        </select>
+        <select id="contains1" name="contains1" class="form-control" onchange="">
+          <option value="Contains">Contains</option>
+          <option value="Exactly">Exactly</option>
+          <option value="BeginsWith">Begins With</option>
+        </select>
+        <input id="inputtext1" class="form-control" name="inputtext1"/>
+      </div>
+    </form>
+    <button id="addbutton1" type="button" class="btn btn-default btn-advsearch" onclick="addCondition()">+</button>
+    <button id="submit" form="advsearch" type="submit" value="advancedSearch" class="btn btn-default btn-advsearch">Submit</button>
+
+    {% if lit %}
+    <br><br><br><br><br>
+    <h2>Results</h2>
+    <p>References that match your search query:</p>   
+
+    <table class="table" >  
+        <thead>
+          <tr>
+    		    <th> Title </th>
+          	<th> Type </th>
+          	<th> Author </th>
+            <th> Primary Field </th>
+          	<th> Description </th>
+            <th> Creator </th>
+          </tr>
+     	  </thead> 	
+        <tbody>
+          {% for l in lit %}
+          	<tr>
+          		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
+          		<td>{{l.refType}}</td>
+          		<td>{{l.author}}</td>
+              <td>{{l.primaryField}}</td>
+          		<td>{{l.description}}</td>
+              <td>{{l.creator}}
+          	</tr>
+          {% endfor %}
+        </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <br>
+  <br>
+
+  <p>
+    <br><br><br><br>
+    <a href="{{ url_for('main.search') }}"> Normal Search</a>
+  </p>
+
+  <script>
+    var counter = 2;
+    // Used to contain the condition numbers set by the user
+    var chosenConditions = [1];
+    // Templaate for new condition html
+    var newCondition = 
+      '<div class="form-inline">'+
+      '  <select id="condition1" name="condition1" class="form-control" onchange="">'+
+      '    <option value="and">And</option>'+
+      '    <option value="or">Or</option>'+
+      '    <option value="not">Not</option>'+
+      '    <option value="ignore">Ignore</option>'+
+      '  </select>'+
+      '  <select id="category1" name="category1" class="form-control" onchange="">'+
+      '    <option value="ReferenceType">Reference Type</option>'+
+      '    <option value="Author">Author/Editor</option>'+
+      '    <option value="Title">Title</option>'+
+      '    <option value="Year">Year</option>'+
+      '    <option value="SourceTitle">Source Title</option>'+
+      '    <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>'+
+      '    <option value="PrimarySecondary">Primary/Secondary Fields</option>'+
+      '    <option value="DateCreated">Date Created</option>'+
+      '    <option value="CreatedBy">Created By</option>'+
+      '    <option value="ModifiedBy">Modified By</option>'+
+      '  </select>'+
+      '  <select id="contains1" name="contains1" class="form-control" onchange="">'+
+      '    <option value="Contains">Contains</option>'+
+      '    <option value="Exactly">Exactly</option>'+
+      '    <option value="BeginsWith">Begins With</option>'+
+      '  </select>'+
+      '  <input id="inputtext1" class="form-control" name="inputtext1"/>'+
+      '</div>';
+    var categoryId = 'category1';
+    var containsId = 'contains1';
+    var inputId = 'inputtext1';
+    var conditionId = 'condition1';
+    var subbuttonId = 'subbutton1';
+
+    function deleteCondition(idarg){
+      elemNum = idarg.replace('subbutton', '');
+
+      var regex = /1/;
+      var category = categoryId.replace(regex, elemNum);
+      var input = inputId.replace(regex, elemNum);
+      var subbutton = subbuttonId.replace(regex, elemNum);
+      var cond = conditionId.replace(regex, elemNum);
+      var contains = containsId.replace(regex, elemNum);
+      
+      // var index = chosenConditions.indexOf(elemNum);
+      // chosenConditions.splice(index, 1);
+
+      $('#'+category).remove();
+      $('#'+input).remove();
+      $('#'+subbutton).remove();
+      $('#'+cond).remove();
+      $('#'+contains).remove();
+    };
+
+    function addCondition(){
+      var regex = /1/gm;
+      // Replace the numbers to the correct number
+      var condition = newCondition.replace(regex, counter.toString());
+      // var addButton = addButtonId.replace('1', counter.toString());
+
+      // var removeButton = addButtonId.replace('1', (counter-1).toString());
+      // alert(removeButton);
+
+      // // Get rid of the plus sign on the previous condition
+      // $('#'+removeButton).remove();
+
+      // alert(condition);
+
+      // Append the new condition fields
+      $('#advsearch').append(condition);
+
+      chosenConditions.push(counter);
+      counter++;
+    }
+
+    function beforeSubmit(){
+      // Add count of conditions in request
+      var hiddenField = document.createElement("input");
+      hiddenField.setAttribute("id", "count");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", "count");
+      hiddenField.setAttribute("value", counter-1);
+      document.getElementById('advsearch').appendChild(hiddenField);
+    }
+  </script>
+
+{% endblock %}

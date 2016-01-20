@@ -116,7 +116,7 @@
     <script type="text/javascript" src="scripts/refine.js"/>
   {% endblock %} -->
 
-  <div class="navbar navbar-default ">
+  <div class="navbar navbar-custom ">
     <div class="container-fluid">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -127,12 +127,12 @@
       </div>
       <div class="collapse navbar-collapse">
 
-      <form id="searchoptions" onsubmit="refined()" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
-        <ul class="nav navbar-nav">
-          <li><input class="btn search-nav" type="submit" name="submitBtn" value="RefineView" /></li>
-          <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
-        </ul>
-      </form>
+        <form id="searchoptions" onsubmit="refined()" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
+          <ul class="nav navbar-nav">
+            <li><input class="btn search-nav" type="submit" name="submitBtn" value="RefineView" /></li>
+            <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
+          </ul>
+        </form>
 
       </div>
     </div>
@@ -227,8 +227,6 @@
       </div>
     {% endif %}
 
-    <br> <br>
-
     <!--  <br> 
 
 <form id="sort" action="{{ url_for('main.search', searchStr = searchString) }}">
@@ -243,8 +241,7 @@
 </form> <button type="submit" form="sort" value="Sort"> Sort </button> -->
 
     <p>
-      <br> Rather do an <a href="{{ url_for('main.exactSearch') }}"> Advanced Search?
-        Go here instead. </a>
+      <br> <a href="{{ url_for('main.advancedSearch') }}"> Advanced Search </a>
     </p>
   </div>
 {% endblock %}

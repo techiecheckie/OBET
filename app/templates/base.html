@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
 <div style = "margin-bottom: 60px">
-<div id="menu" class="navbar navbar-inverse navbar-custom" role="navigation">
+<div id="menu" class="navbar navbar-default" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -27,10 +27,9 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ url_for('main.about') }}">About</a></li>
                         <li><a href="{{ url_for('main.history') }}">History</a></li>
-                        <li><a href="{{ url_for('main.manual') }}">Manuals and Instructions</a></li>
+                        <li><a href="{{ url_for('main.manual') }}">Instructions</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li><a href="{{ url_for('main.search') }}">Browse</a></li>
                 {% if current_user.is_authenticated() %}
                 <li><a href="{{ url_for('main.user', email = current_user.email) }}">Profile</a></li>
