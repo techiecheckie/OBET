@@ -43,13 +43,6 @@ button.search-nav:hover{
 .first-cond{
 	margin-left: 50px;
 }
-button.btn-advsearch{
-	float: left;
-	max-width: 10%;
-}
-span.adv-buttons{
-	display: block-inline;
-}
 /* Main Page */
 button.search-btn{
 	background-color: #006600;

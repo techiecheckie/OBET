@@ -2,23 +2,48 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}OBET - Advanced Search For Literature{% endblock %}
 {% block page_content %}
-<div class="page-header">
- <h1>Advanced Search For Literature</h1>	
-</div>
+
+  <div class="navbar navbar-custom ">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+          data-target=".navbar-collapse">
+          <span class="icon-bar"></span> <span class="icon-bar"></span> <span
+            class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse">
+
+        <form id="searchoptions" onsubmit="<!-- refined() -->" action="">
+ <!-- method="post" enctype="multipart/form-data" -->
+          <ul class="nav navbar-nav">
+            <li><input class="btn search-nav" type="submit" name="submitBtn" value="RefineView" /></li>
+            <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
+          </ul>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="page-header">
+   <h2>Advanced Search For Literature</h2>  
+  </div>
 
   <div class="container">
     <form id="advsearch" onsubmit="beforeSubmit()" action="{{url_for('main.advancedSearch')}}" method="POST">
       <div class="form-inline">
         <select id="condition1" name="condition1" class="form-control">
           <option value=""></option>
+          <option value="not">Not</option>
           <option value="ignore">Ignore</option>
         </select>
         <select id="category1" name="category1" class="form-control" onchange="">
-          <option value="ReferenceType">Reference Type</option>
-          <option value="Author">Author/Editor</option>
-          <option value="Title">Title</option>
-          <option value="Year">Year</option>
-          <option value="SourceTitle">Source Title</option>
+          <option value="refType">Reference Type</option>
+          <option value="author">Author/Editor</option>
+          <option value="title">Title</option>
+          <option value="yrPublished">Year</option>
+          <option value="sourceTitle">Source Title</option>
           <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>
           <option value="PrimarySecondary">Primary/Secondary Fields</option>
           <option value="DateCreated">Date Created</option>
@@ -26,57 +51,120 @@
           <option value="ModifiedBy">Modified By</option>
         </select>
         <select id="contains1" name="contains1" class="form-control" onchange="">
-          <option value="Contains">Contains</option>
-          <option value="Exactly">Exactly</option>
-          <option value="BeginsWith">Begins With</option>
+          <option value="icontains">Contains</option>
+          <option value="iexact">Exactly</option>
+          <option value="istartswith">Begins With</option>
         </select>
         <input id="inputtext1" class="form-control" name="inputtext1"/>
       </div>
     </form>
-    <button id="addbutton1" type="button" class="btn btn-default btn-advsearch" onclick="addCondition()">+</button>
-    <button id="submit" form="advsearch" type="submit" value="advancedSearch" class="btn btn-default btn-advsearch">Submit</button>
+    <button id="addbutton1" type="button" class="btn btn-default" onclick="addCondition()">+</button>
+    <button id="submit" form="advsearch" type="submit" value="advancedSearch" class="btn btn-default ">Submit</button>
 
     {% if lit %}
     <br><br><br><br><br>
     <h2>Results</h2>
     <p>References that match your search query:</p>   
 
-    <table class="table" >  
+      <table class="table">
         <thead>
           <tr>
-    		    <th> Title </th>
-          	<th> Type </th>
-          	<th> Author </th>
-            <th> Primary Field </th>
-          	<th> Description </th>
-            <th> Creator </th>
+            <th></th> 
+            {%if current_user.title or current_user.is_anonymous() %} 
+              <th>Title</th> 
+            {%endif%} 
+            {%if current_user.author or current_user.is_anonymous() %}
+              <th>Author</th> {%endif%} 
+            {%if current_user.primaryField or current_user.is_anonymous() %}
+              <th>Primary Field</th> {%endif%} 
+            {%if current_user.sourceTitle or current_user.is_anonymous() %}
+              <th>Source Title</th> {%endif%} 
+            {%if current_user.editor or current_user.is_anonymous() %}
+              <th>Editor</th> {%endif%} 
+            {%if current_user.yearPublished or current_user.is_anonymous() %}
+              <th>Year Published</th> {%endif%} 
+            {%if current_user.refType or current_user.is_anonymous() %}
+              <th>Type</th> {%endif%} 
+            {%if current_user.creator%}
+              <th>Creator</th> {%endif%} 
+            {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+              <th>Date Created</th> {%endif%} 
+            {%if current_user.lastModified or current_user.is_anonymous() %}
+              <th>Last Modified</th> {%endif%} 
+            {%if current_user.lastModifiedBy%}
+              <th>Last Modified By</th> {%endif%}
           </tr>
-     	  </thead> 	
+        </thead>
+
         <tbody>
           {% for l in lit %}
-          	<tr>
-          		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
-          		<td>{{l.refType}}</td>
-          		<td>{{l.author}}</td>
-              <td>{{l.primaryField}}</td>
-          		<td>{{l.description}}</td>
-              <td>{{l.creator}}
-          	</tr>
+            <tr>
+              <td>
+                <input type="checkbox" id="id_{{l.id}}" name="literature"
+                value="{{l.id}}">
+              </td> 
+              {%if current_user.title or current_user.is_anonymous() %}
+                <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+              {%endif%} 
+              {%if current_user.author or current_user.is_anonymous() %}
+                <td>{{l.author}}</td> 
+              {%endif%} 
+              {%if current_user.primaryField or current_user.is_anonymous() %}
+                <td>{{l.primaryField}}</td> 
+              {%endif%} 
+              {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                <td>{{l.sourceTitle}}</td> 
+              {%endif%} 
+              {%if current_user.editor or current_user.is_anonymous() %}
+                <td>{{l.editor}}</td> 
+              {%endif%} 
+              {%if current_user.yearPublished or current_user.is_anonymous() %}
+                <td>{{l.yrPublished|string()}}</td> 
+              {%endif%} 
+              {%if current_user.refType or current_user.is_anonymous() %}
+                <td>{{l.refType}}</td> 
+              {%endif%} 
+              {%if current_user.creator%}
+                <td><a href="{{ url_for('main.user', email = l.creator) }}">{{l.creator}}</a></td> 
+              {%endif%} 
+              {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+                <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
+              {%endif%} 
+              {%if current_user.lastModified or current_user.is_anonymous() %}
+                <td>{{l.last_edit.date}}</td> 
+              {%endif%} 
+              {%if current_user.lastModifiedBy%}
+                <td>{{l.last_edit.lastUserEdited}}</td> 
+              {%endif%}
+            </tr>
           {% endfor %}
         </tbody>
-    </table>
-  </div>
+      </table>
+    </div>
   {% endif %}
 
   <br>
   <br>
-
+  <br>
+  
   <p>
-    <br><br><br><br>
     <a href="{{ url_for('main.search') }}"> Normal Search</a>
   </p>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script>
+    {% if not lit %}
+      {% set litRefine = [] %}
+    {% else %}
+      {% set litRefine = lit %}
+    {% endif %}
+    {% if not sessioninfo %}
+      {% set sessioninfo = "" %}
+    {% endif %}
+
+    var lit = {{ litRefine|tojson|safe }};
+    var sessioninfo = {{ sessioninfo|tojson|safe }};
+
     var counter = 2;
     // Used to contain the condition numbers set by the user
     var chosenConditions = [1];
@@ -90,11 +178,11 @@
       '    <option value="ignore">Ignore</option>'+
       '  </select>'+
       '  <select id="category1" name="category1" class="form-control" onchange="">'+
-      '    <option value="ReferenceType">Reference Type</option>'+
-      '    <option value="Author">Author/Editor</option>'+
-      '    <option value="Title">Title</option>'+
-      '    <option value="Year">Year</option>'+
-      '    <option value="SourceTitle">Source Title</option>'+
+      '    <option value="refType">Reference Type</option>'+
+      '    <option value="author">Author/Editor</option>'+
+      '    <option value="title">Title</option>'+
+      '    <option value="yrPublished">Year</option>'+
+      '    <option value="sourceTitle">Source Title</option>'+
       '    <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>'+
       '    <option value="PrimarySecondary">Primary/Secondary Fields</option>'+
       '    <option value="DateCreated">Date Created</option>'+
@@ -102,9 +190,9 @@
       '    <option value="ModifiedBy">Modified By</option>'+
       '  </select>'+
       '  <select id="contains1" name="contains1" class="form-control" onchange="">'+
-      '    <option value="Contains">Contains</option>'+
-      '    <option value="Exactly">Exactly</option>'+
-      '    <option value="BeginsWith">Begins With</option>'+
+      '    <option value="icontains">Contains</option>'+
+      '    <option value="iexact">Exactly</option>'+
+      '    <option value="istartswith">Begins With</option>'+
       '  </select>'+
       '  <input id="inputtext1" class="form-control" name="inputtext1"/>'+
       '</div>';
@@ -114,6 +202,7 @@
     var conditionId = 'condition1';
     var subbuttonId = 'subbutton1';
 
+    // NOT NEEDED
     function deleteCondition(idarg){
       elemNum = idarg.replace('subbutton', '');
 
@@ -153,7 +242,7 @@
 
       chosenConditions.push(counter);
       counter++;
-    }
+    };
 
     function beforeSubmit(){
       // Add count of conditions in request
@@ -163,6 +252,77 @@
       hiddenField.setAttribute("name", "count");
       hiddenField.setAttribute("value", counter-1);
       document.getElementById('advsearch').appendChild(hiddenField);
+    }
+
+    // Search through current "lit" list for those checked off
+    function searchList(id){
+      // alert(id);
+      for (var i = 0; i < lit.length; i++){
+        if(lit[i].id == id){
+          // alert("found this " + lit[i].id);
+          return lit[i];
+        }
+      }
+      return null;
+    };
+
+    function printDiv(divName){
+      // var printContents = document.getElementById(divName).innerHTML;
+      // var originalContents = document.body.innerHTML;
+
+      // document.body.innerHTML = printContents;
+      window.print();
+      // document.body.innerHTML = originalContents;
+    };
+
+    $( document ).ready(function(){
+      if(sessioninfo != ""){
+        rebuildQuery();
+      }
+    });
+
+    function rebuildQuery(){
+
+      sessioninfo = JSON.parse(sessioninfo);
+      console.log(sessioninfo);
+      counter = parseInt(sessioninfo.count)+1;
+      console.log(counter);
+
+      // Recreate the same number of fields
+      for(var i = 2; i<=sessioninfo.count; i++){
+        var regex = /1/gm;
+
+        // Replace the numbers to the correct number
+        var formRow = newCondition.replace(regex, i.toString());
+
+        // Append the new condition fields
+        $('#advsearch').append(formRow);
+      }  
+
+      var regex;
+      var category;
+      var input;
+      var cond;
+      var contains;
+
+      // Refill the fields with previous values
+      for(var i = 1; i<=sessioninfo.count; i++){
+        regex = /1/gm;
+        category = categoryId.replace(regex, i);
+        input = inputId.replace(regex, i);
+        cond = conditionId.replace(regex, i);
+        contains = containsId.replace(regex, i);
+
+        console.log(category);
+        console.log(sessioninfo[category]);
+
+        // var fieldid = '#'+category;
+        // console.log(fieldid + " " + typeof fieldid);
+        $('#'+category).val(sessioninfo[category]);
+        $('#'+cond).val(sessioninfo[cond]);
+        $('#'+input).val(sessioninfo[input]);
+        $('#'+contains).val(sessioninfo[contains]);
+      }
     }
   </script>
 

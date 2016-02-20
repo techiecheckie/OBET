@@ -1,18 +1,78 @@
 {% extends "base.html" %}
 
-	{% block title%}
-	About OBET
-	{%endblock%}
+	{% block title %}
+		About OBET
+	{% endblock %}
+
+	{% block head %}
+		<link rel="stylesheet" href="{{ url_for('static', filename='styles/about.css') }}">
+	{% endblock %}
 
 	{% block page_content %}
-	<h1> About OBET  </h1>
 
-	<br>
-	<p>
-	Suspendisse at neque magna. Fusce dapibus viverra ligula quis ullamcorper. Nam varius erat vitae consequat congue. Praesent cursus tellus in elit commodo, ac euismod felis porttitor. Integer tempor in leo egestas venenatis. Vestibulum vulputate pellentesque pellentesque. Pellentesque sit amet est eu ipsum porta varius eget eget tellus.
-	</p>
+		<div class="aboutheader">
+			<img class="obet-deer" src="../static/obetdeer.jpg"/>
 
-	<p>
-	In convallis sem enim, porta blandit nisi fringilla non. In porta, neque ac bibendum dapibus, erat nunc imperdiet odio, suscipit vehicula neque tortor tempus mi. Integer pharetra auctor nisi, ut maximus nunc lobortis a. Ut ullamcorper velit fringilla, tincidunt lacus sit amet, dictum mi. Suspendisse semper ante lectus, non ullamcorper orci iaculis molestie. Praesent vehicula erat id risus viverra, in lacinia erat dignissim. s
-	</p>
+			<h2><b>Online Bibliography of Environmental Thought (OBET)</b></h2>
+			An electronic resource of the International Society for Environmental Ethics
+			<br><a href="http://www.isee-obet.org">http://www.isee-obet.org</a>
+		</div>
+
+
+		<div class="aboutbody">
+			<h2>About OBET</h2>
+			<h5 class="aboutdate">(2016.1)</h5>
+			<hr class="aboutline">
+			<p>OBET is an internet gateway to information on the relationship between humans and nature.  It is the largest such resource in existence, and is free for public use.</p>
+
+			<p>OBET focuses on ideas regardless of disciplinary area, covering any sort of inquiry into the relationship between humans and nature.  Contributions range across philosophy, ethics, theology, anthropology, psychology, sociology, history, politics, law, agriculture, animal welfare, energy, industry, ecology, conservation, nature writing, art, literary criticism, education, and green living.</p> 
+
+			<p>Like most academic databases, the main bibliography is completely searchable and sortable, and entries can be exported in generic formats.  Unlike most academic databases, however, OBET is completely user-managed (by registered Members), and its contents are not limited to professional academic literature.</p>
+
+			<p>In addition to the main database, OBET contains several other resources, such as a collection of user-uploaded files, profiles of all members, and an annotated list of each of the journals whose entire contents are indexed.  Several external databases and bibliographies are also linked so that they can be opened and utilized directly from OBET.</p>
+			<br>
+
+			<h3>Membership</h3>
+
+			<p><br>Anyone can enter as a guest and use OBET—this is one of the benefits of OBET being user-managed.  Most extensive online bibliographic databases are only available for use by paid subscribers.  However, only OBET Members can add and edit entries; provide comments on any work referenced in the database; and upload manuscripts, publications, images, links, and other materials for easy access by anyone.  Each Member’s contributions to the database are acknowledged and maintained, and each Member is associated with a profile on the database; everyone can see which member added or edited each entry.</p>
+
+			<p>We are especially looking for Members who can help with various tasks that are of great importance to this new resource, including the mammoth project of converting entries from the existing ISEE Bibliography to OBET, summarizing books and book chapters, finding additional references, and compiling references to older (pre-1990) literature.  Please contact the Curator to become involved in these and related projects, or with any suggestions.</p>
+
+			<p>Application for membership is quick and easy, and of course free.  Either (1) send a request to the Curator (contact information below), with a bit about you, including your institutional affiliation if any, and the activities you would like to engage in on OBET that led you to apply; or else (2) click on “Log In / Join” at the top right of the OBET Login screen and provide the same information.  You will receive an email in response, with (if your application is successful) a welcome and a temporary password—it will enable you to join OBET, choose a login name and your own password, and set up your personal profile.  After you join, whenever you visit OBET simply Log In with your chosen name and password.  For security reasons we will periodically ask long-inactive members to reapply.</p>
+			<br>
+			<h3>The Future of OBET</h3>
+
+			<p><br>Much work remains to be done before OBET is up to date, and of course it will require incessant maintenance to stay on top of the growing literature on our interaction with nature. Our hope is that the Online Bibliography of Environmental Thought, together with other online resources of the International Society for Environmental Ethics, will become a comprehensive aid to research and thought on the relationship between humans and the rest of the world. We are constantly adding material to OBET. Please let us know if you have ideas about how OBET may be improved. New material and new projects are welcome!</p>
+
+			<p>Donations and volunteers are always needed!  Please contact the Curator for details (see below).</p>
+			<br>
+			<h3>Who We Are</h3>
+
+			<p><br>OBET is completely volunteer-managed, mainly by a Curator, and a support staff comprised mostly of college students in the New York City area.</p>
+
+			<p>OBET is located on an Apache Server at the Center for Computational Infrastructure for the Sciences at Queens College of the City University of New York. OBET is compiled and edited entirely by its registered Members, managed by a Curator in consultation with the Governing Board of ISEE and Prof. Holmes Rolston III.  Prof. Rolston compiled the original ISEE Bibliography, which is still available (and essential until OBET is up to date), at <a href="http://www.cep.unt.edu/bib">http://www.cep.unt.edu/bib</a>.  OBET has received funding from the American Philosophical Association and the International Society for Environmental Ethics.</p>
+			<br>
+			<div class="whoweare">
+				<p class="col-md-4">Curator of OBET, 2010 - : 	</p>
+				<p class="col-md-8">
+					Dr. David C. Lahti<br>
+					Assistant Professor of Biology, Queens College<br>
+					Doctoral Faculty in Biology and Psychology, The Graduate Center<br>
+					City University of New York<br>
+					OBET.Curator@gmail.com<br>
+					(718) 997-3422<br>
+				</p>
+			</div>
+			<br>
+			<p>Chief Programmer:  Teresa Wu<br>
+				Manager of Contributions:   Mark Megerian</p>
+			<div class="sponsors">
+				<img class="sponsorsimg" src="../static/isee.jpg"/><br>
+				<img class="sponsorsimg" src="../static/APA.png"/><br>
+				<img class="sponsorsimg" src="../static/CCiS.jpg"/><br>
+				<img class="sponsorsimg" src="../static/queensbiology.png"/><br>
+				<img class="sponsorsimg" src="../static/queenscs.png"/><br>
+				<img class="sponsorsimg" src="../static/obet.jpg"/>
+			</div>
+		</div>
 	{% endblock %}

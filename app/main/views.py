@@ -4,8 +4,10 @@ from . import main
 from .forms import SearchFormMain, SearchForm, AdvancedSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
+from mongoengine.queryset.visitor import Q
 from flask.ext.login import login_required, current_user
 import json
+import cgi
 
 #######################
 # To be deleted later #
@@ -59,19 +61,20 @@ def convertId(lit):
 		litdate = litdate.replace("L", "")
 		litdate = int(litdate.replace("}", ""))
 		litdate = litdate/1000.0
-		litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S.%f'))
+		litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S'))
 		# print litdate
 		l["created_date"] = litdate
 
 		# Convert date to basic date
-		litdate = "%s" % l["last_edit"]["date"]
-		litdate = litdate.replace("{u'$date': ", "")
-		litdate = litdate.replace("L", "")
-		litdate = int(litdate.replace("}", ""))
-		litdate = litdate/1000.0
-		litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S.%f'))
-		# print "lastedit " + litdate
-		l["last_edit"]["date"] = litdate
+		if("last_edit" in l.keys()):
+			litdate = "%s" % l["last_edit"]["date"]
+			litdate = litdate.replace("{u'$date': ", "")
+			litdate = litdate.replace("L", "")
+			litdate = int(litdate.replace("}", ""))
+			litdate = litdate/1000.0
+			litdate = str(datetime.fromtimestamp(litdate).strftime('%Y-%m-%d %H:%M:%S'))
+			# print "lastedit " + litdate
+			l["last_edit"]["date"] = litdate
 
 	return lit
 
@@ -88,10 +91,7 @@ def fuzzySearch(request):
  		flash("Your search returned nothing. Try other search terms.")
 		return render_template('search.html', form = form, lit = lit)
 	else:
-		# Sort lit
-		sortStr = 'title'
-		form.sort.data = sortStr
-		lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
+		form.sort.data = ''
 
 		# Convert lit to appropiate list object
 		jsonlit = litToJson(lit)
@@ -131,11 +131,9 @@ def searchForm(request):
 
 	else:
 		# Sort lit
-		if request.sort.data:
+		if request.sort.data and str(request.sort.data) != 'None':
 			sortStr = str(request.sort.data)
-		else:
-			sortStr = 'title'
-		lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
+			lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
 
 		# Convert lit to appropiate list object
 		jsonlit = litToJson(lit)
@@ -160,47 +158,162 @@ def search():
  return render_template('search.html', form = form)
 
 ###################
-# Strict Search
+# Advanced Search
 ###################
+
+def convertCat(category):
+	convertedString = ''
+	# validate the string, excape all special chars
+	# ...? 
+	convertedString = cgi.escape(category, quote=True)
+
+	return convertedString
+
+def convertCont(contains):
+	convertedString = ''
+	# validate
+	# ...
+	convertedString = cgi.escape(contains, quote=True)
+
+	return convertedString
+
+def convertInp(inputtext):
+	convertedString = ''
+	
+	convertedString = cgi.escape(inputtext, quote=True)
+	print convertedString
+
+	return convertedString
+
+def convertCond(condition):
+	convertedString = ''
+
+	if(condition == "and"):
+		return "&"
+	elif(condition == "not"):
+		return "ne"
+	else:
+		return "|"
+
+def validInputText(inputtext):
+	# ESCAPE SPECIAL CHRS
+	inputtext = inputtext.strip()
+	if(inputtext=="" or inputtext==None):
+		return False
+	else:
+		return True
+
+def createQuerySeg(x, first):
+	querySeg = ""
+	negation = ""
+
+	# fields of each 
+	category = 'category1'
+	contains = 'contains1'
+	inputtext = 'inputtext1'
+	condition = 'condition1'
+
+	categoryx = str.replace(category, '1', str(x))
+	containsx = str.replace(contains, '1', str(x))
+	inputtextx = str.replace(inputtext, '1', str(x))
+	conditionx = str.replace(condition, '1', str(x))
+
+	print categoryx
+	print containsx
+	print inputtextx
+	print conditionx
+
+	categorystring = request.form[categoryx]
+	containsCond = request.form[containsx]
+	inputtext = request.form[inputtextx]
+	condition = request.form[conditionx]
+
+	convertedCond = convertCond(condition)
+
+	if(convertedCond=="ne"):
+		negation = "__not"
+		if(not first):
+			querySeg += "&"
+	elif(not first):
+		querySeg += convertedCond
+
+	if (validInputText(inputtext)):
+		inputtext = convertInp(inputtext)
+		containsCond = convertInp(containsCond)
+		categorystring = convertCat(categorystring)
+
+		# take the values and convert to model atribute names
+		if(categorystring == 'KeywordsAbstractNotes'):
+			querySeg += ('(Q(keywords' + negation + '__icontains ="' + inputtext + '") | Q(abstract' + 
+				negation + '__icontains ="' + inputtext + '") | Q(notes' + negation + '__icontains ="' + inputtext + '"))')
+		elif(categorystring == 'PrimarySecondary'):
+			querySeg += ('(Q(primaryField' + negation + '__' + containsCond + ' ="' + inputtext + 
+				'") | Q(secondaryField' + negation + '__' + containsCond + ' ="' + inputtext + '"))')
+		elif(categorystring == 'CreatedBy'):
+			querySeg += ('Q(creator' + negation + '__' + containsCond + ' ="' + inputtext + '")')
+		elif(categorystring == 'ModifiedBy'):
+			querySeg += ('Q(last_edit__lastUserEdited' + negation + '__' + containsCond + ' ="' + inputtext + '")')
+		# else if for DATE
+		elif(categorystring == 'DateCreated'):
+			querySeg += ('Q()')
+		else:
+			querySeg += ("Q(" + categorystring + negation + "__" + 
+			containsCond + " ='" + inputtext + "')")
+	return querySeg
 
 @main.route('/advancedSearch', methods=['GET', 'POST'])
 def advancedSearch():
-	pass
-	# DONT FORGET TO ESCAPE ANY SPECIAL CHARACTERS
-	# if request.method == 'POST':
-	# 	print json.dumps(request.form)
-	# 	# print request.form['count']
+	if request.method == 'POST':
+		cond = 'condition1'
+		first = True
+		print json.dumps(request.form)
 
-	# 	# get number of conditions
-	# 	count = int(request.form['count'])
+		# get number of conditions
+		count = int(request.form['count'])
 
-	# 	# string to contain the mongo query
-	# 	query = 'Lit.objects.('
+		# string to contain the mongo query
+		query = 'lit = Lit.objects('
 
-	# 	# fields of each 
-	# 	cond = 'condition1'
-	# 	category = 'category1'
-	# 	contains = 'contains1'
-	# 	inputtext = 'inputtext1'
+		# go through all the conditions and add the information to 
+		for x in xrange(1, count+1):
 
-	# 	# go through all the conditions and add the information to 
-	# 	for x in xrange(1, count+1):
-	# 		condx = str.replace(cond, '1', str(x))
-	# 		categoryx = str.replace(category, '1', str(x))
-	# 		containsx = str.replace(contains, '1', str(x))
-	# 		inputtextx = str.replace(inputtext, '1', str(x))
-	# 		# check if the condition is ignore
-	# 		if( request.form[condx] != 'ignore' ):
-	# 			# print "This is the request " + request.form[condx] + " " + condx
-	# 			# if not ignore then add the information to the mongo query
-	# 			# get the information from the 4 input fields
-	# 			if()
-	# 				query.append('')
+			condx = str.replace(cond, '1', str(x))
+			print condx
 
+			# check if the condition is ignore
+			if( request.form[condx] != 'ignore' ):
+				# print "This is the request " + request.form[condx] + " " + condx
+				# if not ignore then add the information to the mongo query
+				# get the information from the 4 input fields
+				temp = createQuerySeg(x, first)
+				if(temp != None and temp != ''):
+					query += temp
+					first = False
+
+		query += (')')
+		print query
+
+		if( len(query) != 19 ):
+			print 'LENGTH IS NOT 13'
+			exec query
+			# print json.dumps(lit)
+			# lit = Lit.objects(Q(author__iexact = 'bob') | Q(keywords__icontains = 'only'))
+			# print json.dumps(lit)
+
+			if( len(lit)!=0):
+				# Convert lit to appropiate list object
+				jsonlit = litToJson(lit)
+				lit = json.loads(jsonlit)
+				lit = convertId(lit)
+				sessioninfo = json.dumps(request.form)
+				return render_template('AdvancedSearch.html', lit = lit, sessioninfo = sessioninfo)
+			else:
+				flash("Your query had no results.")
+
+ 	return render_template('AdvancedSearch.html')
 		# execute the query
 
 		# return the results as lit and the previous request as prevreq
-
 
  # form = AdvancedSearchForm()
  # if form.validate_on_submit():
@@ -241,7 +354,6 @@ def advancedSearch():
  # 	# Either way, redirect back to this page
  # 	return redirect(url_for('main.advancedSearch'))
  # # If the form doesn't validate at all, rerender
- 	return render_template('advancedSearch.html')
 
 #####################
 # User Profile Page #

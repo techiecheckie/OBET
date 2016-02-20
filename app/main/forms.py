@@ -13,7 +13,7 @@ class SearchFormMain(Form):
     
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
-        sort = SelectField('Sort by: ', choices = [('author', 'Author/Editor'), ('created_date', 'Date Created'), ('creator', 'Creator'), ('primaryField', 'Primary Field'), ('title', 'Title')])
+        sort = SelectField('Sort by: ', choices = [('None',''), ('author', 'Author/Editor'), ('created_date', 'Date Created'), ('creator', 'Creator'), ('primaryField', 'Primary Field'), ('title', 'Title')])
         # add reverse option
         submit = SubmitField('Search')
     	

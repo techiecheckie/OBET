@@ -1,0 +1,32 @@
+img.obet-deer {
+	float: left;
+	margin-right: 50px;
+	max-height: 160px;
+	max-width: 160px;
+}
+.aboutheader {
+	display: inline-block;
+	margin: 30px;
+}
+.aboutbody {
+	margin-left: 30px;
+}
+h5.aboutdate {
+	margin: 0;
+	padding: 0;
+}
+hr.aboutline {
+	margin-top: 8px;
+	padding-top: 0;
+}
+.whoweare {
+	display: inline-block;
+}
+img.sponsorsimg {
+	/*text-align: center;*/
+	max-height: 200px;
+	margin-top: 50px;
+}
+.sponsors {
+	text-align: center;
+}
