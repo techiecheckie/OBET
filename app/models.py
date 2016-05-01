@@ -219,8 +219,8 @@ FIELDS = (('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'),
 
 class Lit(db.Document):
     	refType = db.StringField(max_length = 30, required = True, choices=REFTYPES)
-        author = db.StringField(max_length = 30, unique_with = ['title'])
-    	title = db.StringField(max_length = 120, required = True, unique = True)
+        author = db.StringField(max_length = 150, unique_with = ['title'])
+    	title = db.StringField(max_length = 150, required = True, unique = True)
         yrPublished = db.IntField(min_value = 1800, default = None) # MUST ADD max_value!!! Limit it to THIS year!!
         # Journal title, book title, etc.
         sourceTitle = db.StringField(max_length = 200)
@@ -241,6 +241,7 @@ class Lit(db.Document):
         last_edit = db.EmbeddedDocumentField(LitEditRecord)
         creator = db.StringField(max_length = 30, required = True)
         created_date = db.DateTimeField(default = datetime.datetime.now, required = True)
+        DOI = db.StringField(max_length = 50)
     	# meta = {
      #        'indexes': [
     	# 	  {

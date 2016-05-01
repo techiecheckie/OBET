@@ -14,10 +14,9 @@
       </div>
       <div class="collapse navbar-collapse">
 
-        <form id="searchoptions" onsubmit="<!-- refined() -->" action="">
- <!-- method="post" enctype="multipart/form-data" -->
+        <form id="searchoptions" action="{{url_for('main.advancedSearch')}}" method="post" enctype="multipart/form-data" >
           <ul class="nav navbar-nav">
-            <li><input class="btn search-nav" type="submit" name="submitBtn" value="RefineView" /></li>
+            <li><input class="btn search-nav" onclick="refined()" type="submit" name="submitBtn" value="RefineList" /></li>
             <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
           </ul>
         </form>
@@ -67,77 +66,76 @@
     <p>References that match your search query:</p>   
 
       <table class="table">
-        <thead>
-          <tr>
-            <th></th> 
-            {%if current_user.title or current_user.is_anonymous() %} 
-              <th>Title</th> 
-            {%endif%} 
-            {%if current_user.author or current_user.is_anonymous() %}
-              <th>Author</th> {%endif%} 
-            {%if current_user.primaryField or current_user.is_anonymous() %}
-              <th>Primary Field</th> {%endif%} 
-            {%if current_user.sourceTitle or current_user.is_anonymous() %}
-              <th>Source Title</th> {%endif%} 
-            {%if current_user.editor or current_user.is_anonymous() %}
-              <th>Editor</th> {%endif%} 
-            {%if current_user.yearPublished or current_user.is_anonymous() %}
-              <th>Year Published</th> {%endif%} 
-            {%if current_user.refType or current_user.is_anonymous() %}
-              <th>Type</th> {%endif%} 
-            {%if current_user.creator%}
-              <th>Creator</th> {%endif%} 
-            {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
-              <th>Date Created</th> {%endif%} 
-            {%if current_user.lastModified or current_user.is_anonymous() %}
-              <th>Last Modified</th> {%endif%} 
-            {%if current_user.lastModifiedBy%}
-              <th>Last Modified By</th> {%endif%}
-          </tr>
-        </thead>
-
-        <tbody>
-          {% for l in lit %}
+          <thead>
             <tr>
-              <td>
-                <input type="checkbox" id="id_{{l.id}}" name="literature"
-                value="{{l.id}}">
-              </td> 
-              {%if current_user.title or current_user.is_anonymous() %}
-                <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
-              {%endif%} 
+              <th></th> 
               {%if current_user.author or current_user.is_anonymous() %}
-                <td>{{l.author}}</td> 
-              {%endif%} 
-              {%if current_user.primaryField or current_user.is_anonymous() %}
-                <td>{{l.primaryField}}</td> 
-              {%endif%} 
-              {%if current_user.sourceTitle or current_user.is_anonymous() %}
-                <td>{{l.sourceTitle}}</td> 
-              {%endif%} 
-              {%if current_user.editor or current_user.is_anonymous() %}
-                <td>{{l.editor}}</td> 
-              {%endif%} 
+                <th>Author</th> {%endif%} 
               {%if current_user.yearPublished or current_user.is_anonymous() %}
-                <td>{{l.yrPublished|string()}}</td> 
-              {%endif%} 
-              {%if current_user.refType or current_user.is_anonymous() %}
-                <td>{{l.refType}}</td> 
-              {%endif%} 
-              {%if current_user.creator%}
-                <td><a href="{{ url_for('main.user', email = l.creator) }}">{{l.creator}}</a></td> 
-              {%endif%} 
+                <th>Year</th> {%endif%}               
+              {%if current_user.title or current_user.is_anonymous() %} 
+                <th>Title</th> {%endif%} 
+              {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                <th>Source Title</th> {%endif%}         
+              {%if current_user.primaryField or current_user.is_anonymous() %}
+                <th>Primary Field</th> {%endif%} 
+              {%if current_user.editor %}
+                <th>Editor</th> {%endif%} 
+              {%if current_user.refType %}
+                <th>Type</th> {%endif%} 
+              {%if current_user.creator or current_user.is_anonymous() %}
+                <th>Creator</th> {%endif%} 
               {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
-                <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
-              {%endif%} 
-              {%if current_user.lastModified or current_user.is_anonymous() %}
-                <td>{{l.last_edit.date}}</td> 
-              {%endif%} 
-              {%if current_user.lastModifiedBy%}
-                <td>{{l.last_edit.lastUserEdited}}</td> 
-              {%endif%}
+                <th>Date Created</th> {%endif%} 
+              {%if current_user.lastModified %}
+                <th>Last Modified</th> {%endif%} 
+              {%if current_user.lastModifiedBy %}
+                <th>Last Modified By</th> {%endif%}
             </tr>
-          {% endfor %}
+          </thead>
+
+          <tbody>
+            {% for l in lit %}
+              <tr>
+                <td>
+                  <input type="checkbox" id="id_{{l.id}}" name="literature"
+                  value="{{l.id}}">
+                </td> 
+                {%if current_user.author or current_user.is_anonymous() %}
+                  <td>{{l.author}}</td> 
+                {%endif%}  
+                {%if current_user.yearPublished or current_user.is_anonymous() %}
+                  <td>{{l.yrPublished|string()}}</td> 
+                {%endif%}                
+                {%if current_user.title or current_user.is_anonymous() %}
+                  <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+                {%endif%} 
+                {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                  <td>{{l.sourceTitle}}</td> 
+                {%endif%} 
+                {%if current_user.primaryField or current_user.is_anonymous() %}
+                  <td>{{l.primaryField}}</td> 
+                {%endif%} 
+                {%if current_user.editor %}
+                  <td>{{l.editor}}</td> 
+                {%endif%} 
+                {%if current_user.refType %}
+                  <td>{{l.refType}}</td> 
+                {%endif%} 
+                {%if current_user.creator or current_user.is_anonymous() %}
+                  <td><a href="{{ url_for('main.user', email = l.creator) }}">{{l.creator}}</a></td> 
+                {%endif%} 
+                {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+                  <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
+                {%endif%} 
+                {%if current_user.lastModified %}
+                  <td>{{l.last_edit.date}}</td> 
+                {%endif%} 
+                {%if current_user.lastModifiedBy %}
+                  <td>{{l.last_edit.lastUserEdited}}</td> 
+                {%endif%}
+              </tr>
+            {% endfor %}
         </tbody>
       </table>
     </div>
@@ -153,6 +151,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script>
+
     {% if not lit %}
       {% set litRefine = [] %}
     {% else %}
@@ -164,6 +163,66 @@
 
     var lit = {{ litRefine|tojson|safe }};
     var sessioninfo = {{ sessioninfo|tojson|safe }};
+
+    function refined() {
+
+      // Form element
+      var searchOptions = document.getElementById('searchoptions');
+      // All literature items
+      var checkboxes = document.getElementsByName('literature');
+
+      var n = checkboxes.length;
+      var redefined = [];
+      var count = 0;
+      var found;
+
+      // Search through the list of checked items and save the lit objects into array
+      if( lit != null ) {
+        for(var i=0; i<n; i++) {
+          if(checkboxes[i].checked) {
+            found = searchList(checkboxes[i].value);
+            if( found != null){
+              redefined[count] = found;
+              count++;
+            }
+          }
+        }
+
+        // Store the original search and the new list of lit
+        var redefinedString = JSON.stringify(redefined);
+        // var query = document.getElementById("advsearch");
+
+        // Delete previously appended hidden input elements
+        var redefpar = $("#redefinedString");
+        if(redefpar!=null){
+          $(redefpar).remove();
+          // alert("found redef string");
+        }
+
+        var par = $("#queryString");
+        if(par != null){
+          $(par).remove();
+        }
+
+        // Add object containing redefined list in request
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("id", "redefinedString");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "redefinedString");
+        hiddenField.setAttribute("value", redefinedString);
+        searchOptions.appendChild(hiddenField);
+
+        // Add object containing the previous search query
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("id", "queryString");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "queryString");
+        hiddenField.setAttribute("value", JSON.stringify(sessioninfo));
+        searchOptions.appendChild(hiddenField);
+      }  
+    }
+
+    // Dynamic Search query options ------------------------------------------------------
 
     var counter = 2;
     // Used to contain the condition numbers set by the user
@@ -245,6 +304,11 @@
     };
 
     function beforeSubmit(){
+      var par = $("#count");
+        if(par != null){
+          $(par).remove();
+      }
+
       // Add count of conditions in request
       var hiddenField = document.createElement("input");
       hiddenField.setAttribute("id", "count");
@@ -282,7 +346,6 @@
     });
 
     function rebuildQuery(){
-
       sessioninfo = JSON.parse(sessioninfo);
       console.log(sessioninfo);
       counter = parseInt(sessioninfo.count)+1;

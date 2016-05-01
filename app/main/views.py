@@ -99,25 +99,33 @@ def fuzzySearch(request):
 		lit = convertId(lit)
 		return render_template('search.html', form = form, lit = lit)
 
-def refineView(request):
- 	form = SearchForm()
- 	
- 	# Display all values in request for debugging purposed
- 	f = request
-	for key in f.keys():
-		for value in f.getlist(key):
-			print key,":",value
+def refineList(request, search):
+	if(search == "adv"):
+		formString = request['redefinedString']
+		if formString:
+		 	lit = json.loads(formString)
+		else:
+		 	lit = none
+		return render_template('AdvancedSearch.html', lit = lit, sessioninfo = request['queryString'])
+ 	else:
+	 	form = SearchForm()
+	 	
+	 	# Display all values in request for debugging purposed
+	 # 	f = request
+		# for key in f.keys():
+		# 	for value in f.getlist(key):
+		# 		print key,":",value
 
-	# Set search term to original search term
-	form.search.data = request['queryString']
-	form.sort.data = request['sortStr']
+		# Set search term to original search term
+		form.search.data = request['queryString']
+		form.sort.data = request['sortStr']
 
-	formString = request['redefinedString']
-	if formString:
-	 	lit = json.loads(formString)
-	else:
-	 	lit = none
-	return render_template('search.html', form = form, lit = lit)
+		formString = request['redefinedString']
+		if formString:
+		 	lit = json.loads(formString)
+		else:
+		 	lit = none
+		return render_template('search.html', form = form, lit = lit)
 
 def searchForm(request):
  	form = SearchForm()
@@ -151,9 +159,9 @@ def search():
 	 # If the request is from the main page
 	 elif request.form['submitBtn']=='main':
 	 	return fuzzySearch(request.form)
- 	 # If the request is to refine view
-	 elif request.form['submitBtn']=='RefineView':
-		return refineView(request.form)
+ 	 # If the request is to refine the list of search results
+	 elif request.form['submitBtn']=='RefineList':
+		return refineList(request.form, "reg")
 
  return render_template('search.html', form = form)
 
@@ -218,11 +226,6 @@ def createQuerySeg(x, first):
 	inputtextx = str.replace(inputtext, '1', str(x))
 	conditionx = str.replace(condition, '1', str(x))
 
-	print categoryx
-	print containsx
-	print inputtextx
-	print conditionx
-
 	categorystring = request.form[categoryx]
 	containsCond = request.form[containsx]
 	inputtext = request.form[inputtextx]
@@ -264,51 +267,57 @@ def createQuerySeg(x, first):
 @main.route('/advancedSearch', methods=['GET', 'POST'])
 def advancedSearch():
 	if request.method == 'POST':
-		cond = 'condition1'
-		first = True
-		print json.dumps(request.form)
+		try:
+			if(request.form['submitBtn']=='RefineList'):
+				return refineList(request.form, "adv")
+		except:	
+			cond = 'condition1'
+			first = True
+			# print "request form " + json.dumps(request.form)
 
-		# get number of conditions
-		count = int(request.form['count'])
+			# get number of conditions
+			count = int(request.form['count'])
 
-		# string to contain the mongo query
-		query = 'lit = Lit.objects('
+			# string to contain the mongo query
+			query = 'lit = Lit.objects('
 
-		# go through all the conditions and add the information to 
-		for x in xrange(1, count+1):
+			# go through all the conditions and add the information to 
+			for x in xrange(1, count+1):
 
-			condx = str.replace(cond, '1', str(x))
-			print condx
+				condx = str.replace(cond, '1', str(x))
 
-			# check if the condition is ignore
-			if( request.form[condx] != 'ignore' ):
-				# print "This is the request " + request.form[condx] + " " + condx
-				# if not ignore then add the information to the mongo query
-				# get the information from the 4 input fields
-				temp = createQuerySeg(x, first)
-				if(temp != None and temp != ''):
-					query += temp
-					first = False
+				# check if the condition is ignore
+				if( request.form[condx] != 'ignore' ):
+					print "checking for ignore"
+					# print "This is the request " + request.form[condx] + " " + condx
+					# if not ignore then add the information to the mongo query
+					# get the information from the 4 input fields
+					temp = createQuerySeg(x, first)
+					if(temp != None and temp != ''):
+						query += temp
+						first = False
 
-		query += (')')
-		print query
+			query += (')')
+			print "query is :" + query
 
-		if( len(query) != 19 ):
-			print 'LENGTH IS NOT 13'
-			exec query
-			# print json.dumps(lit)
-			# lit = Lit.objects(Q(author__iexact = 'bob') | Q(keywords__icontains = 'only'))
-			# print json.dumps(lit)
+			if( len(query) != 19 ):
+				print 'LENGTH IS NOT 13'
+				exec query
+				# print json.dumps(lit)
+				# lit = Lit.objects(Q(author__iexact = 'bob') | Q(keywords__icontains = 'only'))
+				# print json.dumps(lit)
 
-			if( len(lit)!=0):
-				# Convert lit to appropiate list object
-				jsonlit = litToJson(lit)
-				lit = json.loads(jsonlit)
-				lit = convertId(lit)
-				sessioninfo = json.dumps(request.form)
-				return render_template('AdvancedSearch.html', lit = lit, sessioninfo = sessioninfo)
-			else:
-				flash("Your query had no results.")
+				if( len(lit)!=0 ):
+					# Convert lit to appropiate list object
+					jsonlit = litToJson(lit)
+					lit = json.loads(jsonlit)
+					lit = convertId(lit)
+					sessioninfo = json.dumps(request.form)
+					return render_template('AdvancedSearch.html', lit = lit, sessioninfo = sessioninfo)
+				else:
+					flash("Your query had no results.")
+					sessioninfo = json.dumps(request.form)
+					return render_template('AdvancedSearch.html', sessioninfo = sessioninfo)
 
  	return render_template('AdvancedSearch.html')
 		# execute the query

@@ -8,9 +8,9 @@
 	
 	<div class="row">
 	    <div class="input-group input-group-lg">
-	      <input id="query" type="text" class="form-control" placeholder="ie Holmes Rolston">
+	      <input id="query" type="text" class="form-control" placeholder="eg., Holmes Rolston">
 	      <span class="input-group-btn">
-	        <button class="btn btn-default search-btn" type="button" onclick="submitform()">Search</button>
+	        <button class="btn btn-default search-btn" type="button" id="searchbtn" onclick="submitform()">Search</button>
 	      </span>
 	    </div>
 	</div>
@@ -23,6 +23,7 @@
 		<input type="hidden" name="submitBtn" value="main"/>
 	</form> 
 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	<script>
 		function submitform(){ 
 			console.log("submitting form1");    
@@ -38,6 +39,15 @@
 
 			document.getElementById("searchForm").submit();
 		}
+
+	    $("#query").keypress(function (e) {
+	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+	            $("#searchbtn").click();
+	            return false;
+	        } else {
+	            return true;
+	        }
+	    });
 	</script>
 
 {% endblock %}
