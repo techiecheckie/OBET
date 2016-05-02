@@ -1,13 +1,32 @@
 from datetime import datetime
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, make_response
 from . import main
 from .forms import SearchFormMain, SearchForm, AdvancedSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from mongoengine.queryset.visitor import Q
 from flask.ext.login import login_required, current_user
-import json
-import cgi
+import json, cgi, csv, io
+
+#########################
+# Testing file download #
+#########################
+# This route will prompt a file download with the csv lines
+@main.route('/download', methods=['GET','POST'])
+def download():
+    csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
+"1985/01/21","Douglas Adams",0345391802,5.95
+"1990/01/12","Douglas Hofstadter",0465026567,9.95
+"1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
+"1999/12/03","Richard Friedman",0060630353,5.95
+"2004/10/04","Randel Helms",0879755725,4.50"""
+    # We need to modify the response, so the first thing we 
+    # need to do is create a response out of the CSV string
+    response = make_response(csv)
+    # This is the key: Set the right header for the response
+    # to be downloaded, instead of just printed on the browser
+    response.headers["Content-Disposition"] = "attachment; filename=books.csv"
+    return response
 
 #######################
 # To be deleted later #
@@ -99,34 +118,6 @@ def fuzzySearch(request):
 		lit = convertId(lit)
 		return render_template('search.html', form = form, lit = lit)
 
-def refineList(request, search):
-	if(search == "adv"):
-		formString = request['redefinedString']
-		if formString:
-		 	lit = json.loads(formString)
-		else:
-		 	lit = none
-		return render_template('AdvancedSearch.html', lit = lit, sessioninfo = request['queryString'])
- 	else:
-	 	form = SearchForm()
-	 	
-	 	# Display all values in request for debugging purposed
-	 # 	f = request
-		# for key in f.keys():
-		# 	for value in f.getlist(key):
-		# 		print key,":",value
-
-		# Set search term to original search term
-		form.search.data = request['queryString']
-		form.sort.data = request['sortStr']
-
-		formString = request['redefinedString']
-		if formString:
-		 	lit = json.loads(formString)
-		else:
-		 	lit = none
-		return render_template('search.html', form = form, lit = lit)
-
 def searchForm(request):
  	form = SearchForm()
  	if request.search.data:
@@ -159,11 +150,110 @@ def search():
 	 # If the request is from the main page
 	 elif request.form['submitBtn']=='main':
 	 	return fuzzySearch(request.form)
+	 elif request.form['submitBtn']=='Export':
+	 	return downloadResults(request.form)
  	 # If the request is to refine the list of search results
 	 elif request.form['submitBtn']=='RefineList':
 		return refineList(request.form, "reg")
 
  return render_template('search.html', form = form)
+
+########################
+# Export to CSV
+########################
+def dict_filter(it, *keys):
+    # for d in it:
+        # yield dict((k, d[k]) for k in keys)
+    for item in it:
+	    for k in keys:
+	    	del item[k]
+
+# This route will prompt a file download with the csv lines
+def downloadResults(request):
+	# Get search results they want to export
+	formString = request['redefinedString']
+	# Convert to python object
+	search_results = json.loads(formString)
+	print "loaded string fine"
+	sio = io.BytesIO()
+	print "Create stringio fine"
+
+	# Get list of id's from the redefined string
+	id_list = []
+	for item in search_results:
+		id_list.append(item["id"])
+	# Query the database for those lit
+	lit = Lit.objects(id__in=id_list)
+	# Create a json from that result
+	lit = litToJson(lit)
+	print "LITERATURE FROM DB " + lit
+	lit = json.loads(lit)
+	# Transfrom it into a tsv
+	header = sorted(lit[0].keys())
+	header.remove("_id")
+	header.remove("l_edit_record")
+	header.remove("last_edit")
+	header.remove("created_date")
+	header.remove("creator")
+	# print search_results
+	# result_filtered = []
+	dict_filter(lit, "_id", "l_edit_record", "last_edit", "created_date", "creator")
+	# for d in lit:
+	# 	dict_filter(lit, "_id", "l_edit_record", "last_edit"):
+		# "refType","author","title","yrPublished","sourceTitle","editor","placePulished","publisher","volume","pages","keywords","abstract","notes","primaryField","secondaryField","link","DOI"):
+		# result_filtered.append(d)
+	# search_results.pop("_id")
+	# search_results.pop("l_edit_record")
+	# search_results.pop("last_edit")
+	dw = csv.DictWriter(sio, header, delimiter='\t')
+	dw.writeheader()
+	dw.writerows(lit)
+	# print sio.getvalue()
+# 		csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
+# "1985/01/21","Douglas Adams",0345391802,5.95
+# "1990/01/12","Douglas Hofstadter",0465026567,9.95
+# "1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
+# "1999/12/03","Richard Friedman",0060630353,5.95
+# "2004/10/04","Randel Helms",0879755725,4.50"""
+    # We need to modify the response, so the first thing we 
+    # need to do is create a response out of the CSV string
+	response = make_response(sio.getvalue())
+    # This is the key: Set the right header for the response
+    # to be downloaded, instead of just printed on the browser
+	response.headers["Content-Disposition"] = "attachment; filename=obet_search.tsv"
+	return response
+
+###################
+# Refine List 
+###################
+
+def refineList(request, search):
+	if(search == "adv"):
+		formString = request['redefinedString']
+		if formString:
+		 	lit = json.loads(formString)
+		else:
+		 	lit = none
+		return render_template('AdvancedSearch.html', lit = lit, sessioninfo = request['queryString'])
+ 	else:
+	 	form = SearchForm()
+	 	
+	 	# Display all values in request for debugging purposed
+	 # 	f = request
+		# for key in f.keys():
+		# 	for value in f.getlist(key):
+		# 		print key,":",value
+
+		# Set search term to original search term
+		form.search.data = request['queryString']
+		form.sort.data = request['sortStr']
+
+		formString = request['redefinedString']
+		if formString:
+		 	lit = json.loads(formString)
+		else:
+		 	lit = none
+		return render_template('search.html', form = form, lit = lit)
 
 ###################
 # Advanced Search
@@ -320,49 +410,6 @@ def advancedSearch():
 					return render_template('AdvancedSearch.html', sessioninfo = sessioninfo)
 
  	return render_template('AdvancedSearch.html')
-		# execute the query
-
-		# return the results as lit and the previous request as prevreq
-
- # form = AdvancedSearchForm()
- # if form.validate_on_submit():
- 	
- # 	#####
- # 	# If there's nothing in the title or author areas, send an error and return.
- # 	if len(form.author.data) == 0 and len(form.title.data) == 0:
- # 		flash("You must enter something in the title or author sections.")
- # 		return redirect(url_for('main.advancedSearch'))
- 	
- # 	#####
- # 	# If only title has data, grab info on that	
- # 	if len(form.author.data) == 0 and form.refType.data == 'None':
- # 		lit = Lit.objects(title__iexact = form.title.data)
- 	
- # 	#####
- # 	# If only author has data, grab info on that	
- # 	elif len(form.title.data) == 0 and form.refType.data == 'None':
- # 		lit = Lit.objects(author__iexact = form.author.data)
- 	
- # 	#####
- # 	# If both title and author have data, grab info on both
- # 	elif form.refType.data == 'None':
- # 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data)
- 	
- # 	#####
- # 	# Otherwise grab everything
- # 	else:
- # 		lit = Lit.objects(title__iexact = form.title.data, author__iexact = form.author.data, refType__iexact = form.refType.data)
- 	
- # 	#####
- # 	# If you don't find any matching objects, flash a message
- # 	if len(lit) == 0:
- # 			flash("Your search returned nothing. Try being less specific.")
- # 	# If you do, render them
- # 	else:
- # 		return render_template('advancedSearch.html', form = form, lit = lit)
- # 	# Either way, redirect back to this page
- # 	return redirect(url_for('main.advancedSearch'))
- # # If the form doesn't validate at all, rerender
 
 #####################
 # User Profile Page #
