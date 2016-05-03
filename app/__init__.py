@@ -7,7 +7,6 @@ from config import config
 from flask.ext.login import LoginManager
 from dotenv import parse_dotenv, load_dotenv
 
-
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'

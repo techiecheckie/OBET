@@ -1,32 +1,14 @@
+# coding=utf-8
+
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, request, make_response
 from . import main
-from .forms import SearchFormMain, SearchForm, AdvancedSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm
+from .forms import SearchFormMain, SearchForm, AdvancedSearchForm, AddLitForm, DeleteLitForm, DeleteUserForm, EditProfileForm, Preferences
 from .. import db
 from ..models import User, Role, Lit, LitEditRecord, UserEditRecord
 from mongoengine.queryset.visitor import Q
 from flask.ext.login import login_required, current_user
-import json, cgi, csv, io
-
-#########################
-# Testing file download #
-#########################
-# This route will prompt a file download with the csv lines
-@main.route('/download', methods=['GET','POST'])
-def download():
-    csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
-"1985/01/21","Douglas Adams",0345391802,5.95
-"1990/01/12","Douglas Hofstadter",0465026567,9.95
-"1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
-"1999/12/03","Richard Friedman",0060630353,5.95
-"2004/10/04","Randel Helms",0879755725,4.50"""
-    # We need to modify the response, so the first thing we 
-    # need to do is create a response out of the CSV string
-    response = make_response(csv)
-    # This is the key: Set the right header for the response
-    # to be downloaded, instead of just printed on the browser
-    response.headers["Content-Disposition"] = "attachment; filename=books.csv"
-    return response
+import json, cgi, csv, io, collections
 
 #######################
 # To be deleted later #
@@ -35,7 +17,6 @@ def download():
 def index():
 	form = SearchFormMain()
  	return render_template('index.html', form = form)
-
 
 ###############
 # Information #
@@ -64,6 +45,7 @@ def litToJson(lit):
 	if len(jsonlit) > 7:
 		jsonlit = jsonlit[:-2]
 	jsonlit += "]"	
+	jsonlit = unicode(jsonlit)
 	return jsonlit
 
 def convertId(lit):
@@ -167,54 +149,74 @@ def dict_filter(it, *keys):
     for item in it:
 	    for k in keys:
 	    	del item[k]
+# Testing Decoding and encoding	    	
+def convert(data):
+    if isinstance(data, basestring):
+        return data.decode("windows-1252")
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
+def encode(data):
+    if isinstance(data, basestring):
+        return data.encode("utf8")
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
 
 # This route will prompt a file download with the csv lines
 def downloadResults(request):
+	html = '\xa0'
+	decoded_str = html.decode("windows-1252")
+	encoded_str = decoded_str.encode("utf8")
+	encoded_str = encoded_str.decode("utf8")
+	print encoded_str
 	# Get search results they want to export
 	formString = request['redefinedString']
+
 	# Convert to python object
 	search_results = json.loads(formString)
-	print "loaded string fine"
-	sio = io.BytesIO()
-	print "Create stringio fine"
 
 	# Get list of id's from the redefined string
 	id_list = []
 	for item in search_results:
 		id_list.append(item["id"])
+
 	# Query the database for those lit
 	lit = Lit.objects(id__in=id_list)
+
 	# Create a json from that result
 	lit = litToJson(lit)
-	print "LITERATURE FROM DB " + lit
 	lit = json.loads(lit)
-	# Transfrom it into a tsv
+
+	lit = convert(lit)
+	lit = encode(lit)
+
+	# Remove unnecessary fields
 	header = sorted(lit[0].keys())
 	header.remove("_id")
 	header.remove("l_edit_record")
 	header.remove("last_edit")
 	header.remove("created_date")
 	header.remove("creator")
-	# print search_results
-	# result_filtered = []
 	dict_filter(lit, "_id", "l_edit_record", "last_edit", "created_date", "creator")
-	# for d in lit:
-	# 	dict_filter(lit, "_id", "l_edit_record", "last_edit"):
-		# "refType","author","title","yrPublished","sourceTitle","editor","placePulished","publisher","volume","pages","keywords","abstract","notes","primaryField","secondaryField","link","DOI"):
-		# result_filtered.append(d)
-	# search_results.pop("_id")
-	# search_results.pop("l_edit_record")
-	# search_results.pop("last_edit")
+
+	# Transfrom it into a tsv
+	sio = io.BytesIO()
+	# Testing using unicodecsv
+	# w = unicodecsv.writer(sio, encoding='utf-8')
+	# w.writerow(header)
+	# w.writerow(literature for literature in lit)
 	dw = csv.DictWriter(sio, header, delimiter='\t')
 	dw.writeheader()
 	dw.writerows(lit)
-	# print sio.getvalue()
-# 		csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
-# "1985/01/21","Douglas Adams",0345391802,5.95
-# "1990/01/12","Douglas Hofstadter",0465026567,9.95
-# "1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
-# "1999/12/03","Richard Friedman",0060630353,5.95
-# "2004/10/04","Randel Helms",0879755725,4.50"""
+
+	# dw.writerow({k:v.encode('utf8') for k,v in lit.items()})
     # We need to modify the response, so the first thing we 
     # need to do is create a response out of the CSV string
 	response = make_response(sio.getvalue())
@@ -360,6 +362,8 @@ def advancedSearch():
 		try:
 			if(request.form['submitBtn']=='RefineList'):
 				return refineList(request.form, "adv")
+			elif request.form['submitBtn']=='Export':
+				return downloadResults(request.form)
 		except:	
 			cond = 'condition1'
 			first = True
@@ -566,13 +570,58 @@ def updateLitSub(lit_id):
 		flash(lit.title + " failed to be updated")
 	return render_template('lit.html', lit = lit)
 
+######################
+# Edit Preferences 
+######################
+
+default_pref = {"author": True, "yrPublished": True, "title":True, "sourceTitle": True, "primaryField": True, "creator": True, "dateCreatedOn": True, "editor": False, "refType": False, "lastModified": False, "lastModifiedBy": False}
+
+class Struct:
+    def __init__(self, **entries): 
+        self.__dict__.update(entries)
+
+@main.route('/edit-pref', methods=['GET', 'POST'])
+def preferences():
+ 	form = Preferences()
+ 	
+ 	# Get cookie containing pref
+ 	preferences = request.cookies.get('preferences')
+
+ 	# If user does not have pref, give default
+	if not preferences:
+		preferences = default_pref
+	else:
+		preferences = json.loads(preferences)
+
+		# Debugging
+		print "GOT PREFERENCE"
+		for item in preferences:
+			print item + " "  + str(preferences[item])
+		print "END PREFERENCES FROM COOKIE"
+
+	# If form is being submitted
+ 	if form.validate_on_submit():
+ 		for attr in form:
+ 			# print attr.name + " " + str(attr.data)
+ 			preferences[attr.name] = attr.data 
+		preferencesobj = Struct(**preferences)
+ 		form = Preferences(None, obj=preferencesobj)
+
+ 		response = make_response(render_template('preferences.html', form=form))
+ 		flash('Your preferences have been saved for your session')
+ 		response.set_cookie('preferences', json.dumps(preferences))
+ 		return response
+	preferencesobj = Struct(**preferences) 	
+ 	form = Preferences(None, preferencesobj)
+ 	return render_template('preferences.html', form=form)
+
 ################
 # Edit Profile #
 ################
 @main.route('/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
- 	form = EditProfileForm()
+	form = EditProfileForm()
  	if form.validate_on_submit():
  		current_user.update(set__name=form.name.data)
  		current_user.update(set__location=form.location.data)

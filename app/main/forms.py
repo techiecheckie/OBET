@@ -60,6 +60,20 @@ class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
+class Preferences(Form):
+    title = BooleanField('Title')
+    author = BooleanField('Author')
+    primaryField = BooleanField('Primary Field')
+    #sourceTitle = BooleanField('Source Title')
+    editor = BooleanField('Editor')
+    yrPublished = BooleanField('Year Published')
+    refType = BooleanField('Reference Type')
+    creator = BooleanField('Creator')
+    dateCreatedOn = BooleanField('Date Created')
+    lastModified = BooleanField('Last Modified')
+    lastModifiedBy = BooleanField('Last Modified By')
+    submit = SubmitField('Update')
+
 class EditProfileForm(Form):
     title = BooleanField('Title')
     author = BooleanField('Author')

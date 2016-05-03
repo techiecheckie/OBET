@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin, AnonymousUserMixin
 import datetime
 
-
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 from . import db
@@ -48,7 +47,7 @@ class User(UserMixin, db.Document):
         primaryField = db.BooleanField(default = True)
         sourceTitle = db.BooleanField(default = True)
         editor = db.BooleanField(default = False)
-        yearPublished = db.BooleanField(default = False)
+        yrPublished = db.BooleanField(default = False)
         refType = db.BooleanField(default = False)
         creator = db.BooleanField(default = False)
         dateCreatedOn = db.BooleanField(default = False)
