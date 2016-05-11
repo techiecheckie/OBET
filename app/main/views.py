@@ -33,6 +33,19 @@ def history():
 def manual():
 	return render_template('manAndInst.html')
 
+##########
+# Browse #
+##########
+@main.route('/browse', methods=['GET'])
+def browse():
+	lit = Lit.objects[:50].order_by('-created_date')
+	preferences = request.cookies.get('preferences')
+	if not preferences: 
+		preferences = default_pref
+	else: 
+		preferences = json.loads(preferences)
+	return render_template('browse.html', lit=lit, preferences=preferences)
+
 ##################
 # Fuzzy Search
 ##################

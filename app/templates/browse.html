@@ -1,0 +1,86 @@
+{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
+{% block title %}OBET - Search For Literature{% endblock %} 
+
+{% block page_content %}
+	<div class="page-header">
+      <h2>Browse Most Recent</h2>
+    </div>
+
+    {% if lit %}
+      <div class="container">
+        <p>
+          The top <b> {{ lit|length }} </b> most recent:
+        </p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              {%if current_user.author or preferences.author %}
+                <th>Author</th> {%endif%} 
+              {%if current_user.yrPublished or preferences.yrPublished %}
+                <th>Year</th> {%endif%}               
+              {%if current_user.title or preferences.title %} 
+                <th>Title</th> {%endif%} 
+              {%if current_user.sourceTitle or preferences.sourceTitle %}
+                <th>Source Title</th> {%endif%}         
+              {%if current_user.primaryField or preferences.primaryField %}
+                <th>Primary Field</th> {%endif%} 
+              {%if current_user.editor or preferences.editor %}
+                <th>Editor</th> {%endif%} 
+              {%if current_user.refType or preferences.refType %}
+                <th>Type</th> {%endif%} 
+              {%if current_user.creator or preferences.creator %}
+                <th>Creator</th> {%endif%} 
+              {%if current_user.dateCreatedOn or preferences.dateCreatedOn %}
+                <th>Date Created</th> {%endif%} 
+              {%if current_user.lastModified or preferences.lastModified %}
+                <th>Last Modified</th> {%endif%} 
+              {%if current_user.lastModifiedBy or preferences.lastModifiedBy%}
+                <th>Last Modified By</th> {%endif%}
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for l in lit %}
+              <tr>
+                {%if current_user.author or preferences.author %}
+                  <td>{{l.author}}</td> 
+                {%endif%}  
+                {%if current_user.yrPublished or preferences.yrPublished %}
+                  <td>{{l.yrPublished|string()}}</td> 
+                {%endif%}                
+                {%if current_user.title or preferences.title %}
+                  <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+                {%endif%} 
+                {%if current_user.sourceTitle or preferences.sourceTitle %}
+                  <td>{{l.sourceTitle}}</td> 
+                {%endif%} 
+                {%if current_user.primaryField or preferences.primaryField %}
+                  <td>{{l.primaryField}}</td> 
+                {%endif%} 
+                {%if current_user.editor or preferences.editor %}
+                  <td>{{l.editor}}</td> 
+                {%endif%} 
+                {%if current_user.refType or preferences.refType %}
+                  <td>{{l.refType}}</td> 
+                {%endif%} 
+                {%if current_user.creator or preferences.creator %}
+                  <td><a href="{{ url_for('main.user', name = l.creator) }}">{{l.creator}}</a></td> 
+                {%endif%} 
+                {%if current_user.dateCreatedOn or preferences.dateCreatedOn %}
+                  <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
+                {%endif%} 
+                {%if current_user.lastModified or preferences.lastModified %}
+                  <td>{{l.last_edit.date}}</td> 
+                {%endif%} 
+                {%if current_user.lastModifiedBy or preferences.lastModifiedBy %}
+                  <td>{{l.last_edit.lastUserEdited}}</td> 
+                {%endif%}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+{% endblock %}
