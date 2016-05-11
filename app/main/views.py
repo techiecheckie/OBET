@@ -16,7 +16,8 @@ import json, cgi, csv, io, collections
 @main.route('/', methods=['GET', 'POST'])
 def index():
 	form = SearchFormMain()
- 	return render_template('index.html', form = form)
+	litcount = Lit.objects.count()
+ 	return render_template('index.html', form = form, litcount = litcount)
 
 ###############
 # Information #
