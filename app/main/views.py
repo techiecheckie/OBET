@@ -45,7 +45,7 @@ def litToJson(lit):
 	if len(jsonlit) > 7:
 		jsonlit = jsonlit[:-2]
 	jsonlit += "]"	
-	jsonlit = unicode(jsonlit)
+	# jsonlit = unicode(jsonlit)
 	return jsonlit
 
 def convertId(lit):
@@ -79,9 +79,14 @@ def convertId(lit):
 
 	return lit
 
+def appendCreatorName(lit):
+	for l in lit:
+		l["creator_name"] = lit
+
 def fuzzySearch(request):
  	form = SearchForm()
- 	queryString = request['query']
+ 	req_form = request.form
+ 	queryString = req_form['query']
  	form.search.data = queryString
  	if(queryString == ''):
  		flash("Your search returned nothing. Try other search terms.")
@@ -98,12 +103,18 @@ def fuzzySearch(request):
 		jsonlit = litToJson(lit)
 		lit = json.loads(jsonlit)
 		lit = convertId(lit)
-		return render_template('search.html', form = form, lit = lit)
 
-def searchForm(request):
+ 		preferences = request.cookies.get('preferences')
+  		if not preferences: 
+ 			preferences = default_pref
+ 		else: 
+ 			preferences = json.loads(preferences)
+		return render_template('search.html', form = form, lit = lit, preferences = preferences)
+
+def searchForm(request, req_form):
  	form = SearchForm()
- 	if request.search.data:
- 		queryString = str(request.search.data)
+ 	if req_form.search.data:
+ 		queryString = str(req_form.search.data)
  	lit = Lit.objects.search_text(queryString).order_by('$text_score')
 
  	if len(lit) == 0:
@@ -112,15 +123,21 @@ def searchForm(request):
 
 	else:
 		# Sort lit
-		if request.sort.data and str(request.sort.data) != 'None':
-			sortStr = str(request.sort.data)
+		if req_form.sort.data and str(req_form.sort.data) != 'None':
+			sortStr = str(req_form.sort.data)
 			lit = sorted(lit, key=lambda lit:getattr(lit, sortStr))
 
 		# Convert lit to appropiate list object
 		jsonlit = litToJson(lit)
 		lit = json.loads(jsonlit)
 		lit = convertId(lit)
-		return render_template('search.html', form = form, lit = lit)
+
+ 		preferences = request.cookies.get('preferences')
+  		if not preferences: 
+ 			preferences = default_pref
+ 		else: 
+ 			preferences = json.loads(preferences)
+		return render_template('search.html', form = form, lit = lit, preferences = preferences)
 
 @main.route('/search', methods=['GET', 'POST'])
 def search():
@@ -128,15 +145,15 @@ def search():
  if request.method == 'POST':
 	 # If the request is to search
 	 if form.validate_on_submit():
-	 	return searchForm(form)
+	 	return searchForm(request, form)
 	 # If the request is from the main page
 	 elif request.form['submitBtn']=='main':
-	 	return fuzzySearch(request.form)
+	 	return fuzzySearch(request)
 	 elif request.form['submitBtn']=='Export':
 	 	return downloadResults(request.form)
  	 # If the request is to refine the list of search results
 	 elif request.form['submitBtn']=='RefineList':
-		return refineList(request.form, "reg")
+		return refineList(request, "reg")
 
  return render_template('search.html', form = form)
 
@@ -149,35 +166,29 @@ def dict_filter(it, *keys):
     for item in it:
 	    for k in keys:
 	    	del item[k]
+
 # Testing Decoding and encoding	    	
-def convert(data):
-    if isinstance(data, basestring):
-        return data.decode("windows-1252")
-    elif isinstance(data, collections.Mapping):
-        return dict(map(convert, data.iteritems()))
-    elif isinstance(data, collections.Iterable):
-        return type(data)(map(convert, data))
-    else:
-        return data
 def encode(data):
     if isinstance(data, basestring):
-        return data.encode("utf8")
+        return data.encode('utf8', 'ignore')
     elif isinstance(data, collections.Mapping):
-        return dict(map(convert, data.iteritems()))
+        return dict(map(encode, data.iteritems()))
     elif isinstance(data, collections.Iterable):
-        return type(data)(map(convert, data))
+        return type(data)(map(encode, data))
     else:
         return data
 
 # This route will prompt a file download with the csv lines
-def downloadResults(request):
-	html = '\xa0'
+def downloadResults(request_form):
+	html = 'Martínez'
 	decoded_str = html.decode("windows-1252")
-	encoded_str = decoded_str.encode("utf8")
-	encoded_str = encoded_str.decode("utf8")
-	print encoded_str
+	encoded_str = html.decode("utf8")
+	# encoded_str = encoded_str.decode("utf8")
+	encoded_str = encoded_str.encode('ascii', errors='backslashreplace')
+	print "ENCODED STRING IN ASCII " + encoded_str
+
 	# Get search results they want to export
-	formString = request['redefinedString']
+	formString = request_form['redefinedString']
 
 	# Convert to python object
 	search_results = json.loads(formString)
@@ -194,29 +205,20 @@ def downloadResults(request):
 	lit = litToJson(lit)
 	lit = json.loads(lit)
 
-	lit = convert(lit)
-	lit = encode(lit)
-
 	# Remove unnecessary fields
-	header = sorted(lit[0].keys())
-	header.remove("_id")
-	header.remove("l_edit_record")
-	header.remove("last_edit")
-	header.remove("created_date")
-	header.remove("creator")
+	header = sorted(["abstract","author","editor","keywords","link","notes","number","pages","placePublished","primaryField","publisher","refType","secondaryField","sourceTitle","title","volume","yrPublished"])
 	dict_filter(lit, "_id", "l_edit_record", "last_edit", "created_date", "creator")
+	header = encode(header)
 
-	# Transfrom it into a tsv
+	# Transfrom it into a tsv with DictWriter
 	sio = io.BytesIO()
-	# Testing using unicodecsv
-	# w = unicodecsv.writer(sio, encoding='utf-8')
-	# w.writerow(header)
-	# w.writerow(literature for literature in lit)
 	dw = csv.DictWriter(sio, header, delimiter='\t')
 	dw.writeheader()
-	dw.writerows(lit)
+	for l in lit:
+		l = encode(l)
+		print str(l)
+		dw.writerow(l)
 
-	# dw.writerow({k:v.encode('utf8') for k,v in lit.items()})
     # We need to modify the response, so the first thing we 
     # need to do is create a response out of the CSV string
 	response = make_response(sio.getvalue())
@@ -231,13 +233,20 @@ def downloadResults(request):
 
 def refineList(request, search):
 	if(search == "adv"):
-		formString = request['redefinedString']
+		req_form = request.form
+		formString = req_form['redefinedString']
 		if formString:
 		 	lit = json.loads(formString)
 		else:
 		 	lit = none
-		return render_template('AdvancedSearch.html', lit = lit, sessioninfo = request['queryString'])
+ 		preferences = request.cookies.get('preferences')
+  		if not preferences: 
+ 			preferences = default_pref
+ 		else: 
+ 			preferences = json.loads(preferences)
+ 		return render_template('AdvancedSearch.html', lit = lit, sessioninfo = req_form['queryString'], preferences = preferences)
  	else:
+ 		req_form = request.form
 	 	form = SearchForm()
 	 	
 	 	# Display all values in request for debugging purposed
@@ -247,15 +256,21 @@ def refineList(request, search):
 		# 		print key,":",value
 
 		# Set search term to original search term
-		form.search.data = request['queryString']
-		form.sort.data = request['sortStr']
+		form.search.data = req_form['queryString']
+		form.sort.data = req_form['sortStr']
 
-		formString = request['redefinedString']
+		formString = req_form['redefinedString']
 		if formString:
 		 	lit = json.loads(formString)
 		else:
 		 	lit = none
-		return render_template('search.html', form = form, lit = lit)
+
+ 		preferences = request.cookies.get('preferences')
+  		if not preferences: 
+ 			preferences = default_pref
+ 		else: 
+ 			preferences = json.loads(preferences)
+		return render_template('search.html', form = form, lit = lit, preferences = preferences)
 
 ###################
 # Advanced Search
@@ -361,10 +376,15 @@ def advancedSearch():
 	if request.method == 'POST':
 		try:
 			if(request.form['submitBtn']=='RefineList'):
-				return refineList(request.form, "adv")
+				return refineList(request, "adv")
 			elif request.form['submitBtn']=='Export':
 				return downloadResults(request.form)
 		except:	
+			preferences = request.cookies.get('preferences')
+	  		if not preferences: 
+	 			preferences = default_pref
+	 		else:
+	 			preferences = json.loads(preferences)
 			cond = 'condition1'
 			first = True
 			# print "request form " + json.dumps(request.form)
@@ -401,17 +421,17 @@ def advancedSearch():
 				# lit = Lit.objects(Q(author__iexact = 'bob') | Q(keywords__icontains = 'only'))
 				# print json.dumps(lit)
 
-				if( len(lit)!=0 ):
+				if( len(lit) != 0 ):
 					# Convert lit to appropiate list object
 					jsonlit = litToJson(lit)
 					lit = json.loads(jsonlit)
 					lit = convertId(lit)
 					sessioninfo = json.dumps(request.form)
-					return render_template('AdvancedSearch.html', lit = lit, sessioninfo = sessioninfo)
+					return render_template('AdvancedSearch.html', lit = lit, sessioninfo = sessioninfo, preferences = preferences)
 				else:
 					flash("Your query had no results.")
 					sessioninfo = json.dumps(request.form)
-					return render_template('AdvancedSearch.html', sessioninfo = sessioninfo)
+					return render_template('AdvancedSearch.html', sessioninfo = sessioninfo, preferences = preferences)
 
  	return render_template('AdvancedSearch.html')
 
@@ -419,10 +439,10 @@ def advancedSearch():
 # User Profile Page #
 #####################
 
-@main.route('/user/<email>')
-def user(email):
-	user = User.objects(email__iexact = email).first()
-	latest_activity = current_user.u_edit_record
+@main.route('/user/<name>')
+def user(name):
+	user = User.objects(name__iexact = name).first()
+	latest_activity = user.u_edit_record
 	latest_activity = sorted(latest_activity, key=lambda la: la.date, reverse=True)
 	latest_activity = latest_activity[0:5]
 	return render_template('user.html', user = user, latest_activity = latest_activity)
@@ -584,20 +604,24 @@ class Struct:
 def preferences():
  	form = Preferences()
  	
- 	# Get cookie containing pref
- 	preferences = request.cookies.get('preferences')
+ 	# If the user is logged in, take their preferences
+	if current_user.is_authenticated():
+		preferences = {"author": current_user.author, "yrPublished": current_user.yrPublished, "title":current_user.title, "sourceTitle": current_user.sourceTitle, "primaryField": current_user.primaryField, "creator": current_user.creator, "dateCreatedOn": current_user.dateCreatedOn, "editor": current_user.editor, "refType": current_user.refType, "lastModified": current_user.lastModified, "lastModifiedBy": current_user.lastModifiedBy}
+ 	else:
+ 		# Get cookie containing pref
+ 		preferences = request.cookies.get('preferences')
+		if preferences:
+			preferences = json.loads(preferences)
 
  	# If user does not have pref, give default
 	if not preferences:
 		preferences = default_pref
-	else:
-		preferences = json.loads(preferences)
 
-		# Debugging
-		print "GOT PREFERENCE"
-		for item in preferences:
-			print item + " "  + str(preferences[item])
-		print "END PREFERENCES FROM COOKIE"
+	# Debugging
+	print "GOT PREFERENCE"
+	for item in preferences:
+		print item + " "  + str(preferences[item])
+	print "END PREFERENCES FROM COOKIE"
 
 	# If form is being submitted
  	if form.validate_on_submit():
@@ -607,9 +631,24 @@ def preferences():
 		preferencesobj = Struct(**preferences)
  		form = Preferences(None, obj=preferencesobj)
 
- 		response = make_response(render_template('preferences.html', form=form))
- 		flash('Your preferences have been saved for your session')
- 		response.set_cookie('preferences', json.dumps(preferences))
+ 		if current_user.is_authenticated():
+	 		current_user.update(set__title = form.title.data)
+	 		current_user.update(set__author = form.author.data)
+	 		current_user.update(set__primaryField = form.primaryField.data)
+	 		current_user.update(set__editor = form.editor.data)
+	 		current_user.update(set__yrPublished = form.yrPublished.data)
+	 		current_user.update(set__refType = form.refType.data)
+	 		current_user.update(set__creator = form.creator.data)
+	 		current_user.update(set__dateCreatedOn = form.dateCreatedOn.data)
+	 		current_user.update(set__lastModified = form.lastModified.data)
+	 		current_user.update(set__lastModifiedBy = form.lastModifiedBy.data)
+	 		flash('Your preferences have been saved')
+
+ 		else:
+ 			flash('Your preferences have been saved for your session')
+			response = make_response(render_template('preferences.html', form=form))
+	 		response.set_cookie('preferences', json.dumps(preferences))
+
  		return response
 	preferencesobj = Struct(**preferences) 	
  	form = Preferences(None, preferencesobj)
@@ -627,16 +666,6 @@ def edit_profile():
  		current_user.update(set__location=form.location.data)
  		current_user.update(set__credentials = form.credentials.data)
  		current_user.update(set__description = form.description.data)
- 		current_user.update(set__title = form.title.data)
- 		current_user.update(set__author = form.author.data)
- 		current_user.update(set__primaryField = form.primaryField.data)
- 		current_user.update(set__editor = form.editor.data)
- 		current_user.update(set__yearPublished = form.yearPublished.data)
- 		current_user.update(set__refType = form.refType.data)
- 		current_user.update(set__creator = form.creator.data)
- 		current_user.update(set__dateCreatedOn = form.dateCreatedOn.data)
- 		current_user.update(set__lastModified = form.lastModified.data)
- 		current_user.update(set__lastModifiedBy = form.lastModifiedBy.data)
  		flash('Your profile has been updated.')
  		return redirect(url_for('.user', email = current_user.email))
  	form = EditProfileForm(None, current_user)

@@ -32,11 +32,12 @@
                 </li>
                 <li><a href="{{ url_for('main.search') }}">Browse</a></li>
                 {% if current_user.is_authenticated() %}
-                <li><a href="{{ url_for('main.user', email = current_user.email) }}">Profile</a></li>
+                <li><a href="{{ url_for('main.user', name = current_user.name) }}">Profile</a></li>
                 {% endif %}
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ url_for('main.preferences') }}">Preferences</a></li>
                 {% if current_user.can(Permission.ADDLIT) or current_user.can(Permission.ADMINISTER) %}
                     <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Material</a></li>
             	    {% if current_user.can(Permission.ADMINISTER) %}
@@ -54,7 +55,6 @@
                     </ul>
                 </li>
                 {% else %}
-                    <li><a href="{{ url_for('main.preferences') }}">Preferences</a></li>
                     <li><a href="{{ url_for('auth.login') }}">Log In / Join</a></li>
                 {% endif %}
             </ul>

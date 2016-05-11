@@ -45,7 +45,7 @@ def register():
             flash('Welcome to OBET, new Admin! Please log in to continue.')
             user.approve()
             return redirect(url_for('auth.login'))
-        send_email('jaying.wu25@qmail.cuny.edu', 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
+        send_email(current_app.config['OBET_ADMIN'], 'New User Information', 'auth/email/adminConfirmation', name = name, email = email, reason = reason)
         flash('The admin must approve your registration before you will be able to register. Check your email soon.')
  		#token = user.generate_confirmation_token()
  		#send_email(user.email, 'Confirm Your Account', 'auth/email/confirm', user=user, token=token)

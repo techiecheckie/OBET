@@ -14,11 +14,11 @@
       </div>
       <div class="collapse navbar-collapse">
 
-        <form id="searchoptions" action="{{url_for('main.advancedSearch')}}" method="post" enctype="multipart/form-data" onsubmit="return confirm('Export checked references as a TSV file?');">
+        <form id="searchoptions" action="{{url_for('main.advancedSearch')}}" method="post" enctype="multipart/form-data" >
           <ul class="nav navbar-nav">
-            <li><input class="btn search-nav" onclick="refined()" type="submit" name="submitBtn" value="RefineList" /></li>
+            <li><input class="btn search-nav" type="submit" onclick="refined()" name="submitBtn" value="RefineList"/></li>
             <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
-            <li><input class="btn search-nav" type="submit" onclick="refined()" name="submitBtn" value="Export"/></li>
+            <li><input id="submitBtn" class="btn search-nav" type="submit" onclick="refined(); return confirm('Export checked references as a TSV file?');" name="submitBtn" value="Export"/></li>
           </ul>
         </form>
 
@@ -64,33 +64,36 @@
     {% if lit %}
     <br><br><br><br><br>
     <h2>Results</h2>
-    <p>References that match your search query:</p>   
+    <p>
+      References that match your search query:
+      <input type="checkbox" onClick="toggle(this)" /> Toggle All<br/>
+    </p>   
 
       <table class="table">
           <thead>
             <tr>
               <th></th> 
-              {%if current_user.author or current_user.is_anonymous() %}
+              {%if current_user.author or preferences.author %}
                 <th>Author</th> {%endif%} 
-              {%if current_user.yrPublished or current_user.is_anonymous() %}
+              {%if current_user.yrPublished or preferences.yrPublished %}
                 <th>Year</th> {%endif%}               
-              {%if current_user.title or current_user.is_anonymous() %} 
+              {%if current_user.title or preferences.title %} 
                 <th>Title</th> {%endif%} 
-              {%if current_user.sourceTitle or current_user.is_anonymous() %}
+              {%if current_user.sourceTitle or preferences.sourceTitle %}
                 <th>Source Title</th> {%endif%}         
-              {%if current_user.primaryField or current_user.is_anonymous() %}
+              {%if current_user.primaryField or preferences.primaryField %}
                 <th>Primary Field</th> {%endif%} 
-              {%if current_user.editor %}
+              {%if current_user.editor or preferences.editor %}
                 <th>Editor</th> {%endif%} 
-              {%if current_user.refType %}
+              {%if current_user.refType or preferences.refType %}
                 <th>Type</th> {%endif%} 
-              {%if current_user.creator or current_user.is_anonymous() %}
+              {%if current_user.creator or preferences.creator %}
                 <th>Creator</th> {%endif%} 
-              {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+              {%if current_user.dateCreatedOn or preferences.dateCreatedOn %}
                 <th>Date Created</th> {%endif%} 
-              {%if current_user.lastModified %}
+              {%if current_user.lastModified or preferences.lastModified %}
                 <th>Last Modified</th> {%endif%} 
-              {%if current_user.lastModifiedBy %}
+              {%if current_user.lastModifiedBy or preferences.lastModifiedBy%}
                 <th>Last Modified By</th> {%endif%}
             </tr>
           </thead>
@@ -102,37 +105,37 @@
                   <input type="checkbox" id="id_{{l.id}}" name="literature"
                   value="{{l.id}}">
                 </td> 
-                {%if current_user.author or current_user.is_anonymous() %}
+                {%if current_user.author or preferences.author %}
                   <td>{{l.author}}</td> 
                 {%endif%}  
-                {%if current_user.yrPublished or current_user.is_anonymous() %}
+                {%if current_user.yrPublished or preferences.yrPublished %}
                   <td>{{l.yrPublished|string()}}</td> 
                 {%endif%}                
-                {%if current_user.title or current_user.is_anonymous() %}
+                {%if current_user.title or preferences.title %}
                   <td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
                 {%endif%} 
-                {%if current_user.sourceTitle or current_user.is_anonymous() %}
+                {%if current_user.sourceTitle or preferences.sourceTitle %}
                   <td>{{l.sourceTitle}}</td> 
                 {%endif%} 
-                {%if current_user.primaryField or current_user.is_anonymous() %}
+                {%if current_user.primaryField or preferences.primaryField %}
                   <td>{{l.primaryField}}</td> 
                 {%endif%} 
-                {%if current_user.editor %}
+                {%if current_user.editor or preferences.editor %}
                   <td>{{l.editor}}</td> 
                 {%endif%} 
-                {%if current_user.refType %}
+                {%if current_user.refType or preferences.refType %}
                   <td>{{l.refType}}</td> 
                 {%endif%} 
-                {%if current_user.creator or current_user.is_anonymous() %}
-                  <td><a href="{{ url_for('main.user', email = l.creator) }}">{{l.creator}}</a></td> 
+                {%if current_user.creator or preferences.creator %}
+                  <td><a href="{{ url_for('main.user', name = l.creator) }}">{{l.creator}}</a></td> 
                 {%endif%} 
-                {%if current_user.dateCreatedOn or current_user.is_anonymous() %}
+                {%if current_user.dateCreatedOn or preferences.dateCreatedOn %}
                   <td>{{l.created_date}}<!-- datetime.datetime.fromtimestamp(l.created_date).strftime('%Y-%m-%d %H:%M:%S') --></td> 
                 {%endif%} 
-                {%if current_user.lastModified %}
+                {%if current_user.lastModified or preferences.lastModified %}
                   <td>{{l.last_edit.date}}</td> 
                 {%endif%} 
-                {%if current_user.lastModifiedBy %}
+                {%if current_user.lastModifiedBy or preferences.lastModifiedBy %}
                   <td>{{l.last_edit.lastUserEdited}}</td> 
                 {%endif%}
               </tr>
@@ -164,6 +167,13 @@
 
     var lit = {{ litRefine|tojson|safe }};
     var sessioninfo = {{ sessioninfo|tojson|safe }};
+
+    function toggle(source) {
+      checkboxes = document.getElementsByName('literature');
+      for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = source.checked;
+      }
+    }
 
     function refined() {
 
