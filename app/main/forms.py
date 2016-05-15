@@ -1,22 +1,35 @@
+#################################
+# Form definitions as classes 
+#################################
+
+
+# Import the Form class, fields, and validators from wtform
 from flask.ext.wtf import Form
 from wtforms import StringField, TextAreaField, BooleanField, SubmitField, FieldList, IntegerField, SelectField, SelectMultipleField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Length, Optional, Email, Regexp, NumberRange, URL
 from wtforms import ValidationError
 from wtforms import widgets
 #from flask.ext.pagedown.fields import PageDownField
-from ..models import User, Lit, Role
-from wtforms.fields.html5 import EmailField
 
+# Import database models
+from ..models import User, Lit, Role
+
+# Search form for index.html (main page)
 class SearchFormMain(Form):
+    # Search by
     search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
+    # Submit button
     submit = SubmitField('Search')
     
+# Search form for regular search
 class SearchForm(Form):
 	search = StringField('Enter some terms to search on separated by a space:', validators = [Required()])
         sort = SelectField('Sort by: ', choices = [('None',''), ('author', 'Author/Editor'), ('created_date', 'Date Created'), ('creator', 'Creator'), ('primaryField', 'Primary Field'), ('title', 'Title')])
-        # add reverse option
         submit = SubmitField('Search')
-    	
+    
+# Not currently being used
+# Advanced search
 class AdvancedSearchForm(Form):
     	refType = SelectField('Reference Type', choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),
         ('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')], default = None)
@@ -24,6 +37,7 @@ class AdvancedSearchForm(Form):
 	author = StringField('Author', default = None)
     	submit = SubmitField('Search')
     	
+# For for privileged users to add material into the database
 class AddLitForm(Form):
     refType = SelectField('Reference Type', validators = [Required()], choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')])
     author = StringField('Author', validators = [Length(0,120)])
@@ -44,10 +58,14 @@ class AddLitForm(Form):
     link = StringField('Link', validators = [URL(), Optional()], filters = [lambda x: x or None])
     submit = SubmitField('Submit')   
     	
+# Delete user 
+# Not currently being used
 class DeleteUserForm(Form):
 	email = EmailField("Email", validators=[Required()])
     	submit = SubmitField('Delete User')
 
+# Delete literature 
+# Not currently being used
 class DeleteLitForm(Form):
 	refType = SelectField('Reference Type', choices=[('Book Section','Book Section'), ('Edited Book', 'Edited Book') , ('Journal Article', 'Journal Article'), ('Journal Issue', 'Journal Issue'),
         ('Magazine Article', 'Magazine Article'), ('Media', 'Media'), ('Newspaper Article', 'Newspaper Article'), ('Report', 'Report'), ('Thesis', 'Thesis'), ('Website', 'Website')], default = None)
@@ -55,11 +73,13 @@ class DeleteLitForm(Form):
         author = StringField('Author', validators = [Required(), Length(1,120)])
     	submit = SubmitField('Delete Lit')
 
-# Not currently in use
+# Test
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
+# User preferences for search results view
+# User may chose which fields to show in their search results
 class Preferences(Form):
     author = BooleanField('Author')
     yrPublished = BooleanField('Year Published')
@@ -74,6 +94,7 @@ class Preferences(Form):
     lastModifiedBy = BooleanField('Last Modified By')
     submit = SubmitField('Update')
 
+# Edit user profile
 class EditProfileForm(Form):
     credentials = StringField('Credentials', validators=[Length(0, 64)])
     location = StringField('Location', validators=[Length(0, 64)])
@@ -83,6 +104,7 @@ class EditProfileForm(Form):
         #searchFields = MultiCheckboxField('Search Table Fields', choices=fields)
     submit = SubmitField('Update')
 
+# Admin profile
 class EditProfileAdminForm(Form):
  	email = StringField('Email', validators=[Required(), Length(1, 64), Email()])
  	role = SelectField('Role')
