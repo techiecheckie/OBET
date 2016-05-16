@@ -1,66 +1,82 @@
+<!-- User profile -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - User Profile{% endblock %}
+
+{% block title %}
+	OBET - User Profile
+{% endblock %}
+
 {% block page_content %}
+	<link rel="stylesheet" href="jquery-ui.min.css">
+	<script src="external/jquery/jquery.js"></script>
+	<script src="jquery-ui.min.js"></script>
 
-<link rel="stylesheet" href="jquery-ui.min.css">
-<script src="external/jquery/jquery.js"></script>
-<script src="jquery-ui.min.js"></script>
+	<div class="page-header">
+		<!-- Name -->
+	 	<h1>{{ user.name }}</h1>
+	 
+	 	<!-- Credentials -->
+	 	<p>
+	 		{% if user.credentials %}Credentials: {{ user.credentials }}{% endif %}
+	 	</p>
+	 
+	 	<!-- Location -->
+	 	<p>
+	 		{% if user.location %}
+	 			Lives in: <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
+	 		{% endif %}
+	 	</p>
+	 
+	 	<!-- If admin, display the user's email -->
+	 	<p>
+	 		{% if current_user.is_administrator() %}
+	 			Email to: <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+	 		{% endif %}
+	 	</p>
+	 	
+	 	<!-- About -->
+	 	<p>
+	 		{% if current_user.description %}About Me: {{ current_user.description }}{% endif %}
+	 	</p>
+	 
+	 	<!-- Member since -->
+	 	<p>
+	 		Member since {{ moment(user.member_since).format('L') }}.
+	 	</p>
 
-<div class="page-header">
- 	<h1>{{ user.name }}</h1>
- 
- 	<p>
- 		{% if user.credentials %}Credentials: {{ user.credentials }}{% endif %}
- 	</p>
- 
- 	<p>
- 		{% if user.location %}
- 			Lives in: <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
- 		{% endif %}
- 	</p>
- 
- 	<p>
- 		{% if current_user.is_administrator() %}
- 			Email to: <a href="mailto:{{ user.email }}">{{ user.email }}</a>
- 		{% endif %}
- 	</p>
- 	
- 	<p>
- 		{% if current_user.description %}About Me: {{ current_user.description }}{% endif %}
- 	</p>
- 
- 	<p>
- 		Member since {{ moment(user.member_since).format('L') }}.
- 	</p>
- 	<p>
- 		Last seen {{ moment(user.last_seen).fromNow() }}.
- 	</p>
- 	<p>
- 		Recent activity:
- 		<br>
- 		{% if latest_activity %}
- 			{% for la in latest_activity %}
- 				<li> 
-				{{ la.operation }}
-				{% if la.operation|string() != 'delete' %} 
-					<a href="{{ url_for('main.lit', lit_id = la.litEdited) }}"> 
-				{% endif %}
-				{{ la.litEditedTitle }} 
-				{% if la.operation|string() != 'delete' %} </a> {% endif %}
-				on {{ la.date }} 
- 			{% endfor %}
- 		{% endif %}
- 	</p>
- 
-{% if user == current_user %}
-	<a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile
-	</a>
-{% endif %}
+	 	<!-- Last seen -->
+	 	<p>
+	 		Last seen {{ moment(user.last_seen).fromNow() }}.
+	 	</p>
 
-</div>
+	 	<!-- Recent Activity -->
+	 	<p>
+	 		Recent activity:
+	 		<br>
+	 		{% if latest_activity %}
+	 			{% for la in latest_activity %}
+	 				<li> 
+					{{ la.operation }}
+					<!-- Link to literature edited -->
+					{% if la.operation|string() != 'delete' %} 
+						<a href="{{ url_for('main.lit', lit_id = la.litEdited) }}"> 
+					{% endif %}
+					{{ la.litEditedTitle }} 
+					{% if la.operation|string() != 'delete' %} </a> {% endif %}
+					on {{ la.date }} 
+	 			{% endfor %}
+	 		{% endif %}
+	 	</p>
+	 
+		<!-- If user's profile is logged in user, allow them to edit -->
+		{% if user == current_user %}
+			<a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile
+			</a>
+		{% endif %}
+	</div>
 
 
-<script type="text/javascript">
-</script>
+	<script type="text/javascript">
+	</script>
 {% endblock %}

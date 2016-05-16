@@ -1,9 +1,13 @@
+/* About page styles */
+
+/* top left deer picture on about page */
 img.obet-deer {
 	float: left;
 	margin-right: 50px;
 	max-height: 160px;
 	max-width: 160px;
 }
+
 .aboutheader {
 	display: inline-block;
 	margin: 30px;
@@ -22,6 +26,8 @@ hr.aboutline {
 .whoweare {
 	display: inline-block;
 }
+
+/* Sponsors pictures */
 img.sponsorsimg {
 	/*text-align: center;*/
 	max-height: 200px;

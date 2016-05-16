@@ -1,85 +1,99 @@
+<!-- Base html -->
+<!-- Contains basic html that every page will load -->
+
 {% extends "bootstrap/base.html" %}
 
-{% block title %}OBET{% endblock %}
+{% block title %}
+    OBET
+{% endblock %}
 
 {% block navbar %}
+    <!-- Import bootstrap and custom styles -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <!-- Navigation bar -->
+    <div style = "margin-bottom: 60px">
+    <div id="menu" class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!-- Brand -->
+                <a class="navbar-brand " href="{{ url_for('main.index') }}">OBET</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Info -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Info 
+                        <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('main.about') }}">About</a></li>
+                            <li><a href="{{ url_for('main.history') }}">History</a></li>
+                            <li><a href="{{ url_for('main.manual') }}">Instructions</a></li>
+                        </ul>
+                    </li>
+                    <!-- Browse -->
+                    <li><a href="{{ url_for('main.browse') }}">Browse</a></li>
+                    <!-- If user is logged in, display profile -->
+                    {% if current_user.is_authenticated() %}
+                        <li><a href="{{ url_for('main.user', name = current_user.name) }}">Profile</a></li>
+                    {% endif %}
+                </ul>
 
-<div style = "margin-bottom: 60px">
-<div id="menu" class="navbar navbar-default" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand " href="{{ url_for('main.index') }}">OBET</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Info 
-                    <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('main.about') }}">About</a></li>
-                        <li><a href="{{ url_for('main.history') }}">History</a></li>
-                        <li><a href="{{ url_for('main.manual') }}">Instructions</a></li>
-                    </ul>
-                </li>
-                <li><a href="{{ url_for('main.browse') }}">Browse</a></li>
-                {% if current_user.is_authenticated() %}
-                <li><a href="{{ url_for('main.user', name = current_user.name) }}">Profile</a></li>
-                {% endif %}
-            </ul>
+                <!-- Navigation bar right side -->
+                <ul class="nav navbar-nav navbar-right">
+                    <!-- Change preferences -->
+                    <li><a href="{{ url_for('main.preferences') }}">Preferences</a></li>
+                    <!-- Add material if user can edit -->
+                    {% if current_user.can(Permission.ADDLIT) or current_user.can(Permission.ADMINISTER) %}
+                        <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Material</a></li>
+                        <!-- Admin can delete users -->
+                	    {% if current_user.can(Permission.ADMINISTER) %}
+                	       <li><a href="{{ url_for('main.deleteUser', name = current_user.name) }}">Delete User</a></li>
+                	    {% endif %}
+                    {% endif %}
 
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="{{ url_for('main.preferences') }}">Preferences</a></li>
-                {% if current_user.can(Permission.ADDLIT) or current_user.can(Permission.ADMINISTER) %}
-                    <li><a href="{{ url_for('main.addLit', name = current_user.name) }}">Add Material</a></li>
-            	    {% if current_user.can(Permission.ADMINISTER) %}
-            	       <li><a href="{{ url_for('main.deleteUser', name = current_user.name) }}">Delete User</a></li>
-            	    {% endif %}
-                {% endif %}
-
-                {% if current_user.is_authenticated() %}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
-                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-                    </ul>
-                </li>
-                {% else %}
-                    <li><a href="{{ url_for('auth.login') }}">Log In / Join</a></li>
-                {% endif %}
-            </ul>
+                    <!-- If logged in, user can change email, password and log out -->
+                    {% if current_user.is_authenticated() %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
+                            <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+                            <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                        </ul>
+                    </li>
+                    <!-- Otherwise display login button -->
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}">Log In / Join</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
+<!-- Where "flash" messages are displayed -->
 {% block content %}
-<div class="container">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        {% block page_content %}{% endblock %}
     </div>
-    {% endfor %}
-
-    {% block page_content %}{% endblock %}
-
-</div>
-</div>
 {% endblock %}
-
 
 {% block scripts %}
-{{ super() }}
-{{ moment.include_moment() }}
+    {{ super() }}
+    {{ moment.include_moment() }}
 {% endblock %}

@@ -1,25 +1,30 @@
-{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
-{% block title %}OBET - Search For Literature{% endblock %} 
+<!-- Search page -->
+
+{% extends "base.html" %} 
+{% import "bootstrap/wtf.html" as wtf %} 
+
+{% block title %}
+  OBET - Search For Literature
+{% endblock %} 
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 {% endblock %}
 
 {% block page_content %}
-  <!-- main area -->
   <script>
+    // If lit is not defined, set litRefine to empty array
     {% if not lit %}
       {% set litRefine = [] %}
     {% else %}
       {% set litRefine = lit %}
     {% endif %}
 
+    // Convert litRefine to json
     var lit = {{ litRefine|tojson|safe }};
 
+    // When RefineList button is clicked
     function refined() {
-
-      // alert("hello from here!");
-
       // Form element
       var searchOptions = document.getElementById('searchoptions');
       // All literature items
@@ -44,27 +49,24 @@
 
         // Store the original search and the new list of lit
         var redefinedString = JSON.stringify(redefined);
-        // alert(redefinedString);
         var query = document.getElementById("search").value;
         var sortStr = document.getElementById("sort").value;
 
         // Delete previously appended hidden input elements
         var par = $("#queryString");
         if(par != null){
-          // alert("found qyert string");
           $(par).remove();
         }
         var redefpar = $("#redefinedString");
         if(redefpar!=null){
           $(redefpar).remove();
-          // alert("found redef string");
         }
         var sort = $("#sortStr");
         if(sort!=null){
           $(sort).remove();
         }
 
-        // Add current search term in request
+        // Add current search term in hidden field
         var querystr = document.createElement("input");
         querystr.setAttribute("id", "queryString");
         querystr.setAttribute("type", "hidden");
@@ -72,7 +74,7 @@
         querystr.setAttribute("value", query);
         searchOptions.appendChild(querystr);
 
-        // Add object in request
+        // Add refined list in hidden field
         var hiddenField = document.createElement("input");
         hiddenField.setAttribute("id", "redefinedString");
         hiddenField.setAttribute("type", "hidden");
@@ -80,7 +82,7 @@
         hiddenField.setAttribute("value", redefinedString);
         searchOptions.appendChild(hiddenField);
 
-        // Add object in request
+        // Add sort option in as hidden field
         var hiddenField = document.createElement("input");
         hiddenField.setAttribute("id", "sortStr");
         hiddenField.setAttribute("type", "hidden");
@@ -92,16 +94,16 @@
 
     // Search through current "lit" list for those checked off
     function searchList(id){
-      // alert(id);
       for (var i = 0; i < lit.length; i++){
         if(lit[i].id == id){
-          // alert("found this " + lit[i].id);
           return lit[i];
         }
       }
       return null;
     }
 
+    // Print results - should modify to print only the query and results
+    // Site header should not be printed
     function printDiv(divName){
       // var printContents = document.getElementById(divName).innerHTML;
       // var originalContents = document.body.innerHTML;
@@ -124,6 +126,7 @@
     <script type="text/javascript" src="scripts/refine.js"/>
   {% endblock %} -->
 
+  <!-- Advanced search navigation bar -->
   <div class="navbar navbar-custom ">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -137,8 +140,11 @@
 
         <form id="searchoptions" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data" >
           <ul class="nav navbar-nav">
+            <!-- Refine list -->
             <li><input class="btn search-nav" type="submit" onclick="refined()" name="submitBtn" value="RefineList"/></li>
+            <!-- Print -->
             <li><button class="btn search-nav" type="button" onclick="printDiv('printableArea');"> Print </button></li>
+            <!-- Export -->
             <li><input id="submitBtn" class="btn search-nav" type="submit" onclick="refined(); return confirm('Export checked references as a TSV file?');" name="submitBtn" value="Export"/></li>
           </ul>
         </form>
@@ -154,6 +160,7 @@
 
     {{ wtf.quick_form(form) }} <br><br>
 
+    <!-- If there are search results, display based on user preferences -->
     {% if lit %}
       <div class="container">
         <h2>Results</h2>
@@ -162,10 +169,14 @@
           <input type="checkbox" onClick="toggle(this)" /> Toggle All<br/>
         </p>
 
+        <!-- Search results table -->
         <table class="table">
+          <!-- Table header defintion -->
           <thead>
             <tr>
+              <!-- Extra empty space for checkboxes -->
               <th></th> 
+              <!-- If user has author in their prefered view, display author etc.-->
               {%if current_user.author or preferences.author %}
                 <th>Author</th> {%endif%} 
               {%if current_user.yrPublished or preferences.yrPublished %}
@@ -191,9 +202,12 @@
             </tr>
           </thead>
 
+          <!-- Table body -->
           <tbody>
+            <!-- For each result obj retrieved from the db -->
             {% for l in lit %}
               <tr>
+                <!-- Checkbox, id is id_<object_id> -->
                 <td>
                   <input type="checkbox" id="id_{{l.id}}" name="literature"
                   value="{{l.id}}">

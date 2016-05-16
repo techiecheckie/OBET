@@ -1,3 +1,5 @@
+/* Site styles */
+
 input.btn {
 	margin: 6px;
 	float: left;
@@ -43,6 +45,7 @@ button.search-nav:hover{
 .first-cond{
 	margin-left: 50px;
 }
+
 /* Main Page */
 button.search-btn{
 	background-color: #006600;
@@ -113,6 +116,7 @@ input.form-control{
 .navbar-default .navbar-link:hover {
   color: #ffffff;
 }
+/* Styles of site nav bar on smaller screens ie. phones */
 @media (max-width: 767px) {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
     color: #fbfeff;

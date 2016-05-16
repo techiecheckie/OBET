@@ -1,56 +1,60 @@
+<!-- Not used anymore -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Precise Search For Literature{% endblock %}
+
+{% block title %}
+  OBET - Precise Search For Literature
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Advanced Search For Literature</h1>	
-</div>
+  <div class="page-header">
+   <h1>Advanced Search For Literature</h1>	
+  </div>
 
-<div class="col-md-4">
+  <div class="col-md-4">
 
+    <div class="container">
+      <h2>Results</h2>
+      <p>References that match your search query:</p>   
 
-<div class="container">
-  <h2>Results</h2>
-  <p>References that match your search query:</p>   
+    <table class="table" >  
+        <thead>
+          <tr>
+    		    <th >Title </th>
+          	<th >Type </th>
+          	<th >Author </th>
+            <th >Primary Field </th>
+          	<th >Description</th>
+            <th >Creator </th>
+          </tr>
+     	  </thread> 	
+        
+        <tbody>
+          {% for l in lit %}
+          	<tr>
+          		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td>
+          		<td>{{l.refType}}</td>
+          		<td>{{l.author}}</td>
+              <td>{{l.primaryField}}</td>
+          		<td>{{l.description}}</td>
+              <td>{{l.creator}}
+          	</tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    </div>
 
-<table class="table" >  
-    <thead>
-      <tr>
-		<th >Title </th>
-      	<th >Type </th>
-      	<th >Author </th>
-        <th >Primary Field </th>
-      	<th >Description</th>
-        <th >Creator </th>
-      </tr>
- 	</thread> 	
-    <tbody>
+    <br>
+    <br>
 
-    {% for l in lit %}
-
-    	<tr>
-    		<td><a href="{{ url_for('main.lit', lit_id = l.id) }}">{{l.title}}</a></td> 
-    		<td>{{l.refType}}</td>
-    		<td>{{l.author}}</td>
-        <td>{{l.primaryField}}</td>
-    		<td>{{l.description}}</td>
-        <td>{{l.creator}}
-    	</tr>
-    {% endfor %}
-    </tbody>
-</table>
-</div>
-
-<br>
-<br>
-
- {{ wtf.quick_form(form) }}
- <p>
- <br><br><br>
- Rather do a less strict search?
- <a href="{{ url_for('main.search') }}">
- Go here instead.
- </a>
-</p>
-</div>
+    {{ wtf.quick_form(form) }}
+    <p>
+    <br><br><br>
+    Rather do a less strict search?
+    <a href="{{ url_for('main.search') }}">
+      Go here instead.
+    </a>
+    </p>
+  </div>
 {% endblock %}

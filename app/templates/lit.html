@@ -1,52 +1,63 @@
-{% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
-{% block title %}OBET - Literature Profile{% endblock %}
+<!-- Individual literature page -->
+
+{% extends "base.html" %} 
+{% import "bootstrap/wtf.html" as wtf %} 
+
+{% block title %}
+	OBET - Literature Profile
+{% endblock %}
+
 {% block page_content %}
+	<!-- Literature information -->
+	<div class="page-header">
+		<h3>Title: {{ lit.title }}</h3>
+		<p><b>Reference Type: </b>{% if lit.refType %}{{ lit.refType }}{% endif %} </p>
+		<p><b>Author: </b>{% if lit.author %}{{ lit.author }}{% endif %}</p>
+		<p><b>Year Published: </b>{% if lit.yrPublished %}{{ lit.yrPublished }}{% endif %}</p>
+		<p><b>Source Title: </b>{% if lit.sourceTitle %}{{ lit.sourceTitle }}{% endif %}</p>
+		<p><b>Editor: </b>{% if lit.editor %}{{ lit.editor }}{% endif %}</p>
+		<p><b>Place Published: </b>{% if lit.placePublished %}{{ lit.placePublished }}{% endif %}</p>
+		<p><b>Publisher: </b>{% if lit.publisher %}{{ lit.publisher }}{% endif %} </p>
+		<p><b>Volume: </b>{% if lit.volume %}{{ lit.volume }}{% endif %}</p>
+		<p><b>Number: </b>{% if lit.number %}{{ lit.number }}{% endif %}</p>
+		<p><b>Pages: </b>{% if lit.pages %}{{ lit.pages }}{% endif %}</p>
+		<!-- Display keywords if exists -->
+		<p><b>Keywords: </b>{% if lit.keywords %}
+			<ul>
+				<!-- For each keyword -->
+				{% for t in lit.keywords %}
+					{% if t is not none %}<li>{{ t }}</li>{% endif %} 
+				{% endfor %}
+			</ul>
+		{% else %} None {% endif %}
+		</p>
+		<p>{% if lit.abstract %}<b>Abstract: </b>{{ lit.abstract }}{% endif %}</p>
+		<p>{% if lit.notes %}<b>Notes: </b>{{ lit.notes }}{% endif %}</p>
+		<p>{% if lit.primaryField %}<b>Primary Field: </b>{{ lit.primaryField }}{% endif %}</p>
+		<p>{% if lit.secondaryField %}<b>Secondary Field: </b>{{ lit.secondaryField }}{% endif %}</p>
+		<p>
+		<p>{% if lit.link %}<b>Link: </b>{{ lit.link }}{% endif %}</p>
+		<p>
+			<b>Creator: </b>{{ lit.creator }} <br> &nbsp;&nbsp;on {{ lit.created_date}}
+		</p>
+		<p>
+			<b>Last Updated by: </b>{% if lit.last_edit %} {{ lit.last_edit.lastUserEdited }} 
+				<br> &nbsp;&nbsp;on {{ lit.last_edit.date }} {% else %} None {% endif %}
+		</p>
 
-<div class="page-header">
-	<h3>Title: {{ lit.title }}</h3>
-	<p><b>Reference Type: </b>{% if lit.refType %}{{ lit.refType }}{% endif %} </p>
-	<p><b>Author: </b>{% if lit.author %}{{ lit.author }}{% endif %}</p>
-	<p><b>Year Published: </b>{% if lit.yrPublished %}{{ lit.yrPublished }}{% endif %}</p>
-	<p><b>Source Title: </b>{% if lit.sourceTitle %}{{ lit.sourceTitle }}{% endif %}</p>
-	<p><b>Editor: </b>{% if lit.editor %}{{ lit.editor }}{% endif %}</p>
-	<p><b>Place Published: </b>{% if lit.placePublished %}{{ lit.placePublished }}{% endif %}</p>
-	<p><b>Publisher: </b>{% if lit.publisher %}{{ lit.publisher }}{% endif %} </p>
-	<p><b>Volume: </b>{% if lit.volume %}{{ lit.volume }}{% endif %}</p>
-	<p><b>Number: </b>{% if lit.number %}{{ lit.number }}{% endif %}</p>
-	<p><b>Pages: </b>{% if lit.pages %}{{ lit.pages }}{% endif %}</p>
-	<p><b>Keywords: </b>{% if lit.keywords %}
-		<ul>
-			{% for t in lit.keywords %}
-			{% if t is not none %}<li>{{ t }}</li>{% endif %} 
-			{% endfor %}
-		</ul>
-	{% else %} None {% endif %}
-	</p>
-	<p>{% if lit.abstract %}<b>Abstract: </b>{{ lit.abstract }}{% endif %}</p>
-	<p>{% if lit.notes %}<b>Notes: </b>{{ lit.notes }}{% endif %}</p>
-	<p>{% if lit.primaryField %}<b>Primary Field: </b>{{ lit.primaryField }}{% endif %}</p>
-	<p>{% if lit.secondaryField %}<b>Secondary Field: </b>{{ lit.secondaryField }}{% endif %}</p>
-	<p>
-	<p>{% if lit.link %}<b>Link: </b>{{ lit.link }}{% endif %}</p>
-	<p>
-		<b>Creator: </b>{{ lit.creator }} <br> &nbsp;&nbsp;on {{ lit.created_date}}
-	</p>
-	<p>
-		<b>Last Updated by: </b>{% if lit.last_edit %} {{ lit.last_edit.lastUserEdited }} 
-			<br> &nbsp;&nbsp;on {{ lit.last_edit.date }} {% else %} None {% endif %}
-	</p>
-
-	{% if current_user.is_administrator() %}
-	<p>
-		<a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}">
-			<button type="button">Delete</button></a>
-	</p>
-	{% endif %}
-	{% if current_user.is_authenticated() %}
-	<p>
-		<a href="{{ url_for('main.updateLit', lit_id = lit.id) }}">
-			<button type="button">Update</button></a>
-	</p>
-	{% endif %}
-</div>
+		<!-- If user is admin, they can delete the item -->
+		{% if current_user.is_administrator() %}
+		<p>
+			<a href="{{ url_for('main.deleteLiterature', lit_id = lit.id) }}">
+				<button type="button">Delete</button></a>
+		</p>
+		{% endif %}
+		<!-- If user is logged in, they can edit the item -->
+		{% if current_user.is_authenticated() %}
+		<p>
+			<a href="{{ url_for('main.updateLit', lit_id = lit.id) }}">
+				<button type="button">Update</button></a>
+		</p>
+		{% endif %}
+	</div>
 {% endblock %}

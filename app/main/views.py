@@ -288,7 +288,7 @@ def downloadResults(request_form):
 	lit = json.loads(lit)
 
 	# Remove unnecessary fields
-	header = sorted(["abstract","author","editor","keywords","link","notes","number","pages","placePublished","primaryField","publisher","refType","secondaryField","sourceTitle","title","volume","yrPublished"])
+	header = sorted(["abstract","author","editor","keywords","link","notes","number","pages","placePublished","primaryField","publisher","refType","secondaryField","sourceTitle","title","volume","yrPublished","DOI"])
 	dict_filter(lit, "_id", "l_edit_record", "last_edit", "created_date", "creator")
 	header = encode(header)
 
@@ -298,7 +298,6 @@ def downloadResults(request_form):
 	dw.writeheader()
 	for l in lit:
 		l = encode(l)
-		print str(l)
 		dw.writerow(l)
 
     # We need to modify the response, so the first thing we 

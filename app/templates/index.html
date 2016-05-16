@@ -1,39 +1,57 @@
+<!-- Index/Main page -->
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET{% endblock %}
+
+{% block title %}
+	OBET
+{% endblock %}
+
 {% block page_content %}
-	<div class="centered-search"><img src="../static/obetsearchbox.png" class="img-responsive" alt="search_box"></div>
+	<div class="centered-search">
+		<img src="../static/obetsearchbox.png" class="img-responsive" alt="search_box">
+	</div>
 
 	<br>
 
-	<h4 style="text-align:center"> Currently the database contains <b>{{ litcount }}</b> documents </h4>
+	<!-- Display database status -->
+	<h4 style="text-align:center"> 
+		Currently the database contains <b>{{ litcount }}</b> documents 
+	</h4>
 	
+	<!-- Search form -->
 	<div class="row">
 	    <div class="input-group input-group-lg">
 	      <input id="query" type="text" class="form-control" placeholder="e.g., Holmes Rolston">
+	      <!-- Search button -->
 	      <span class="input-group-btn">
 	        <button class="btn btn-default search-btn" type="button" id="searchbtn" onclick="submitform()">Search</button>
 	      </span>
 	    </div>
 	</div>
 
+	<!-- Disclaimer text -->
 	<p style="text-align:center"><br> <i> ** Disclaimer: Registration is not currently open! Registration will be up in the coming weeks </i> </p>
 
+	<!-- Link to advanced search -->
 	<p class="centered-advanced-search">
 	  <br><a href="{{ url_for('main.advancedSearch') }}"> Advanced Search</a>
 	</p>
 
+	<!-- Hidden input field -->
 	<form id="searchForm" action="{{url_for('main.search')}}" method="post" enctype="multipart/form-data">
 		<input type="hidden" name="submitBtn" value="main"/>
 	</form> 
 
+	<!-- Import jquery -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<!-- Script -->
 	<script>
+		// Search button on click
 		function submitform(){ 
-			console.log("submitting form1");    
+			// Get searchForm form dom element 
 			var searchform = document.getElementById('searchForm'); 
 
-			// Add object in request
+			// Add hidden field object in request
 	        var hiddenField = document.createElement("input");
 	        hiddenField.setAttribute("id", "query");
 	        hiddenField.setAttribute("type", "hidden");
@@ -41,9 +59,11 @@
 	        hiddenField.setAttribute("value", document.getElementById('query').value||"");
 	        searchform.appendChild(hiddenField);
 
+	        // Submit post request back to server
 			document.getElementById("searchForm").submit();
 		}
 
+		// If user is editing the search, and clicks enter, submit request -->
 	    $("#query").keypress(function (e) {
 	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
 	            $("#searchbtn").click();

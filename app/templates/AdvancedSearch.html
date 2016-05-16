@@ -1,19 +1,31 @@
+<!-- Advanced search -->
+<!-- Expects preferences - user's choices of result fields
+      Accepts lit - search results list, sessioninfo - query --> 
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Advanced Search For Literature{% endblock %}
+
+{% block title %}
+  OBET - Advanced Search For Literature
+{% endblock %}
+
 {% block page_content %}
 
+  <!-- Advanced search navigation bar -->
   <div class="navbar navbar-custom ">
     <div class="container-fluid">
-      <div class="navbar-header">
+
+      <!-- ?? -->
+<!--       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse"
           data-target=".navbar-collapse">
-          <span class="icon-bar"></span> <span class="icon-bar"></span> <span
-            class="icon-bar"></span>
+          <span class="icon-bar"></span> 
+          <span class="icon-bar"></span> 
+          <span class="icon-bar"></span>
         </button>
-      </div>
-      <div class="collapse navbar-collapse">
+      </div> -->
 
+      <div class="collapse navbar-collapse">
         <form id="searchoptions" action="{{url_for('main.advancedSearch')}}" method="post" enctype="multipart/form-data" >
           <ul class="nav navbar-nav">
             <li><input class="btn search-nav" type="submit" onclick="refined()" name="submitBtn" value="RefineList"/></li>
@@ -21,15 +33,16 @@
             <li><input id="submitBtn" class="btn search-nav" type="submit" onclick="refined(); return confirm('Export checked references as a TSV file?');" name="submitBtn" value="Export"/></li>
           </ul>
         </form>
-
       </div>
     </div>
   </div>
 
+  <!-- Page title -->
   <div class="page-header">
-   <h2>Advanced Search For Literature</h2>  
+    <h2>Advanced Search For Literature</h2>  
   </div>
 
+  <!-- Search Query builder -->
   <div class="container">
     <form id="advsearch" onsubmit="beforeSubmit()" action="{{url_for('main.advancedSearch')}}" method="POST">
       <div class="form-inline">
@@ -46,7 +59,6 @@
           <option value="sourceTitle">Source Title</option>
           <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>
           <option value="PrimarySecondary">Primary/Secondary Fields</option>
-          <option value="DateCreated">Date Created</option>
           <option value="CreatedBy">Created By</option>
           <option value="ModifiedBy">Modified By</option>
         </select>
@@ -58,21 +70,30 @@
         <input id="inputtext1" class="form-control" name="inputtext1"/>
       </div>
     </form>
+
+    <!-- Add additional conditions to query button -->
     <button id="addbutton1" type="button" class="btn btn-default" onclick="addCondition()">+</button>
     <button id="submit" form="advsearch" type="submit" value="advancedSearch" class="btn btn-default ">Submit</button>
 
+    <!-- If there are search results, display based on user preferences -->
     {% if lit %}
-    <br><br><br><br><br>
-    <h2>Results</h2>
-    <p>
-      References that match your search query:
-      <input type="checkbox" onClick="toggle(this)" /> Toggle All<br/>
-    </p>   
+      <br><br><br><br><br>
 
+      <h2>Results</h2>
+      <p>
+        References that match your search query:
+        <b> {{ lit|length }} </b> references that match your search query:
+        <input type="checkbox" onClick="toggle(this)" /> Toggle All<br/>
+      </p>   
+
+      <!-- Search results table -->
       <table class="table">
+          <!-- Table header defintion -->
           <thead>
             <tr>
+              <!-- Extra empty space for checkboxes -->
               <th></th> 
+              <!-- If user has author in their prefered view, display author etc.-->
               {%if current_user.author or preferences.author %}
                 <th>Author</th> {%endif%} 
               {%if current_user.yrPublished or preferences.yrPublished %}
@@ -98,13 +119,17 @@
             </tr>
           </thead>
 
+          <!-- Table body -->
           <tbody>
+            <!-- For each result obj retrieved from the db -->
             {% for l in lit %}
               <tr>
+                <!-- Checkbox, id is id_<object_id> -->
                 <td>
                   <input type="checkbox" id="id_{{l.id}}" name="literature"
                   value="{{l.id}}">
                 </td> 
+                <!-- Display field if in user preferences -->
                 {%if current_user.author or preferences.author %}
                   <td>{{l.author}}</td> 
                 {%endif%}  
@@ -149,31 +174,30 @@
   <br>
   <br>
   
+  <!-- Link to normal search page -->
   <p>
     <a href="{{ url_for('main.search') }}"> Normal Search</a>
   </p>
 
+  <!-- Import external jquery script -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <!-- Our script -->
   <script>
 
+    // If there are search results then set litRefine to the list of results 
     {% if not lit %}
       {% set litRefine = [] %}
     {% else %}
       {% set litRefine = lit %}
     {% endif %}
+    // If no session information given set query to empty string
     {% if not sessioninfo %}
       {% set sessioninfo = "" %}
     {% endif %}
 
+    // Load the python objects to json
     var lit = {{ litRefine|tojson|safe }};
     var sessioninfo = {{ sessioninfo|tojson|safe }};
-
-    function toggle(source) {
-      checkboxes = document.getElementsByName('literature');
-      for(var i=0, n=checkboxes.length;i<n;i++) {
-        checkboxes[i].checked = source.checked;
-      }
-    }
 
     function refined() {
 
@@ -182,9 +206,13 @@
       // All literature items
       var checkboxes = document.getElementsByName('literature');
 
+      // Number of results
       var n = checkboxes.length;
+      // Contains the results that should be kept in view
       var redefined = [];
+      // Count of saved results
       var count = 0;
+      // Contains the result object
       var found;
 
       // Search through the list of checked items and save the lit objects into array
@@ -201,7 +229,8 @@
 
         // Store the original search and the new list of lit
         var redefinedString = JSON.stringify(redefined);
-        // var query = document.getElementById("advsearch");
+
+        // --- To save information into the request to the server, I saved data as hiddenfields inside the form "searchoptions" ----
 
         // Delete previously appended hidden input elements
         var redefpar = $("#redefinedString");
@@ -209,13 +238,12 @@
           $(redefpar).remove();
           // alert("found redef string");
         }
-
         var par = $("#queryString");
         if(par != null){
           $(par).remove();
         }
 
-        // Add object containing redefined list in request
+        // Add object containing redefined list to form
         var hiddenField = document.createElement("input");
         hiddenField.setAttribute("id", "redefinedString");
         hiddenField.setAttribute("type", "hidden");
@@ -223,22 +251,20 @@
         hiddenField.setAttribute("value", redefinedString);
         searchOptions.appendChild(hiddenField);
 
-        // Add object containing the previous search query
+        // Add object containing the previous search query to form
         var hiddenField = document.createElement("input");
         hiddenField.setAttribute("id", "queryString");
         hiddenField.setAttribute("type", "hidden");
         hiddenField.setAttribute("name", "queryString");
         hiddenField.setAttribute("value", JSON.stringify(sessioninfo));
         searchOptions.appendChild(hiddenField);
-      }  
+      } // End if 
     }
 
     // Dynamic Search query options ------------------------------------------------------
 
     var counter = 2;
-    // Used to contain the condition numbers set by the user
-    var chosenConditions = [1];
-    // Templaate for new condition html
+    // Templaate for new condition in html
     var newCondition = 
       '<div class="form-inline">'+
       '  <select id="condition1" name="condition1" class="form-control" onchange="">'+
@@ -255,7 +281,6 @@
       '    <option value="sourceTitle">Source Title</option>'+
       '    <option value="KeywordsAbstractNotes">Keywords/Abstract/Notes</option>'+
       '    <option value="PrimarySecondary">Primary/Secondary Fields</option>'+
-      '    <option value="DateCreated">Date Created</option>'+
       '    <option value="CreatedBy">Created By</option>'+
       '    <option value="ModifiedBy">Modified By</option>'+
       '  </select>'+
@@ -266,13 +291,14 @@
       '  </select>'+
       '  <input id="inputtext1" class="form-control" name="inputtext1"/>'+
       '</div>';
+    // Input names (number incremented for each additional condition in query)
     var categoryId = 'category1';
     var containsId = 'contains1';
     var inputId = 'inputtext1';
     var conditionId = 'condition1';
     var subbuttonId = 'subbutton1';
 
-    // NOT NEEDED
+    // Not currently in use
     function deleteCondition(idarg){
       elemNum = idarg.replace('subbutton', '');
 
@@ -293,34 +319,28 @@
       $('#'+contains).remove();
     };
 
+    // When the "+" button is clicked
     function addCondition(){
       var regex = /1/gm;
-      // Replace the numbers to the correct number
+
+      // Replace the '1' to current count
       var condition = newCondition.replace(regex, counter.toString());
-      // var addButton = addButtonId.replace('1', counter.toString());
-
-      // var removeButton = addButtonId.replace('1', (counter-1).toString());
-      // alert(removeButton);
-
-      // // Get rid of the plus sign on the previous condition
-      // $('#'+removeButton).remove();
-
-      // alert(condition);
 
       // Append the new condition fields
       $('#advsearch').append(condition);
 
-      chosenConditions.push(counter);
       counter++;
     };
 
+    //When refine list or download clicked, before request to servers made
     function beforeSubmit(){
+      // Remove old hidden field containing the number of conditions
       var par = $("#count");
         if(par != null){
           $(par).remove();
       }
 
-      // Add count of conditions in request
+      // Add count of conditions as a hidden field in request
       var hiddenField = document.createElement("input");
       hiddenField.setAttribute("id", "count");
       hiddenField.setAttribute("type", "hidden");
@@ -331,16 +351,16 @@
 
     // Search through current "lit" list for those checked off
     function searchList(id){
-      // alert(id);
       for (var i = 0; i < lit.length; i++){
         if(lit[i].id == id){
-          // alert("found this " + lit[i].id);
           return lit[i];
         }
       }
       return null;
     };
 
+    // Print results - should modify to print only the query and results
+    // Site header should not be printed
     function printDiv(divName){
       // var printContents = document.getElementById(divName).innerHTML;
       // var originalContents = document.body.innerHTML;
@@ -350,17 +370,17 @@
       // document.body.innerHTML = originalContents;
     };
 
+    // When the page is loaded, rebuild and display the user's previous query
     $( document ).ready(function(){
       if(sessioninfo != ""){
         rebuildQuery();
       }
     });
 
-    function rebuildQuery(){
+    // Rebuild the query in the page
+    function rebuildQuery(){ 
       sessioninfo = JSON.parse(sessioninfo);
-      console.log(sessioninfo);
       counter = parseInt(sessioninfo.count)+1;
-      console.log(counter);
 
       // Recreate the same number of fields
       for(var i = 2; i<=sessioninfo.count; i++){
@@ -390,14 +410,19 @@
         console.log(category);
         console.log(sessioninfo[category]);
 
-        // var fieldid = '#'+category;
-        // console.log(fieldid + " " + typeof fieldid);
         $('#'+category).val(sessioninfo[category]);
         $('#'+cond).val(sessioninfo[cond]);
         $('#'+input).val(sessioninfo[input]);
         $('#'+contains).val(sessioninfo[contains]);
       }
     }
-  </script>
 
+    // Toggle all checkboxes
+    function toggle(source) {
+      checkboxes = document.getElementsByName('literature');
+      for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = source.checked;
+      }
+    }
+  </script>
 {% endblock %}

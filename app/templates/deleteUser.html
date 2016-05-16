@@ -1,20 +1,26 @@
+<!-- Delete user -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Delete User{% endblock %}
+
+{% block title %}
+	OBET - Delete User
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Delete User</h1>	
-</div>
+	<div class="page-header">
+	 <h1>Delete User</h1>	
+	</div>
 
-<div class="col-md-4">
+	<!-- Display list of users matching query -->
+	<div class="col-md-4">
+		{% for u in user %}
+			<p>{{u.id}}</p>
+			<P>{{u.name}}</p>
+			<p>{{u.email}}</p>
 
-{% for u in user %}
-	<p>{{u.id}}</p>
-	<P>{{u.name}}</p>
-	<p>{{u.email}}</p>
-
-{% endfor %}
- 
-{{ wtf.quick_form(form) }}
-</div>
+		{% endfor %}
+		 
+		{{ wtf.quick_form(form) }}
+	</div>
 {% endblock %}

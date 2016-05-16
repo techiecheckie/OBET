@@ -1,14 +1,20 @@
+<!-- Update literature -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Update Literature{% endblock %}
+
+{% block title %}
+	OBET - Update Literature
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Update Literature</h1>	
-</div>
+	<div class="page-header">
+ 		<h1>Update Literature</h1>	
+	</div>
 
-<div class="col-md-4">
-
- {{ wtf.quick_form(form, action=url_for('main.updateLitSub', lit_id = lit.id)) }}
-<p></p><br><br>
-</div>
+	<!-- Load form for updating literature -->
+	<div class="col-md-4">
+		{{ wtf.quick_form(form, action=url_for('main.updateLitSub', lit_id = lit.id)) }}
+		<p></p><br><br>
+	</div>
 {% endblock %}

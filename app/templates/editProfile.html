@@ -1,16 +1,21 @@
+<!-- Edit user profile -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Edit Profile{% endblock %}
+
+{% block title %}
+	OBET - Edit Profile
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Edit Profile</h1>	
-</div>
+	<div class="page-header">
+		<h1>Edit Profile</h1>	
+	</div>
 
-<div class="col-md-4">
+	<div class="col-md-4">
+		<p> <b>Username </b> : {{ current_user.name }} </p>
 
-<p> <b>Username </b> : {{ current_user.name }} </p>
+		 {{ wtf.quick_form(form) }}
 
- {{ wtf.quick_form(form) }}
-
-</div>
+	</div>
 {% endblock %}

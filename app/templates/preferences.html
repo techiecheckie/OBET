@@ -1,15 +1,20 @@
+<!-- Preferences page -->
+<!-- Allows users to chose which fields they wish to see on the search results page -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Edit Preferences{% endblock %}
+
+{% block title %}
+	OBET - Edit Preferences
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Edit Preferences</h1>	
-</div>
+	<div class="page-header">
+ 		<h1>Edit Preferences</h1>	
+	</div>
 
-<div class="col-md-4">
-
-Search Table Field Preferences:
- {{ wtf.quick_form(form) }}
-
-</div>
+	<div class="col-md-4">
+		Search Table Field Preferences:
+ 		{{ wtf.quick_form(form) }}
+	</div>
 {% endblock %}

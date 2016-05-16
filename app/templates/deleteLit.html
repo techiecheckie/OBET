@@ -1,24 +1,29 @@
+<!-- Delete literature not used -->
+
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block title %}OBET - Delete Literature{% endblock %}
+
+{% block title %}
+	OBET - Delete Literature
+{% endblock %}
+
 {% block page_content %}
-<div class="page-header">
- <h1>Delete Literature</h1>	
-</div>
+	<div class="page-header">
+		<h1>Delete Literature</h1>	
+	</div>
 
-<div class="col-md-4">
-
-{% for l in lit %}
- <a href="{{ url_for('main.lit', lit_id = l.id) }}"><button type="button">
- 	<p>Title: {{l.title}}</p>
-	<p>Type: {{l.refType}}</p>
-	<p>Author: {{l.author}}</p>
-	<p>Description: {{l.description}}</p>
-</button></a>
-<br>
-<br>
-{% endfor %}
- 
-{{ wtf.quick_form(form) }}
-</div>
+	<div class="col-md-4">
+		{% for l in lit %}
+			 <a href="{{ url_for('main.lit', lit_id = l.id) }}"><button type="button">
+			 	<p>Title: {{l.title}}</p>
+				<p>Type: {{l.refType}}</p>
+				<p>Author: {{l.author}}</p>
+				<p>Description: {{l.description}}</p>
+			</button></a>
+			<br>
+			<br>
+		{% endfor %}
+		 
+		{{ wtf.quick_form(form) }}
+	</div>
 {% endblock %}

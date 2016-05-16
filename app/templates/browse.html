@@ -1,3 +1,6 @@
+<!-- Browse -->
+<!-- Displays database most recent updates -->
+
 {% extends "base.html" %} {% import "bootstrap/wtf.html" as wtf %} 
 {% block title %}OBET - Search For Literature{% endblock %} 
 
@@ -12,8 +15,11 @@
           The top <b> {{ lit|length }} </b> most recent:
         </p>
 
+        <!-- Results table -->
         <table class="table">
+          <!-- Table headers -->
           <thead>
+            <!-- Fields displayed based on user preferences -->
             <tr>
               {%if current_user.author or preferences.author %}
                 <th>Author</th> {%endif%} 
@@ -40,6 +46,7 @@
             </tr>
           </thead>
 
+          <!-- For each item in results list, display the corresponding column values -->
           <tbody>
             {% for l in lit %}
               <tr>

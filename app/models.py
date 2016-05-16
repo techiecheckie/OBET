@@ -1,16 +1,25 @@
+#######################################
+# Database models 
+#######################################
+
+# Import mongoengine and flask modules
 from flask import current_app, request, url_for
 from flask.ext.mongoengine.wtf import model_form
 from flask.ext.wtf import Form
+# Import wtforms
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
+# Werkzeug
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin, AnonymousUserMixin
-import datetime
 
+import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+
 from . import db
 
+# Embedded document 
+# Contains a record of a user's activity
 class UserEditRecord(db.EmbeddedDocument):
     litEdited = db.StringField(required = True)
     litEditedTitle = db.StringField(required = True)
@@ -19,14 +28,8 @@ class UserEditRecord(db.EmbeddedDocument):
 
     def __repr__(self):
         return '<UserEditRecord %s, %s>' % (self.litEdited, self.date)
-    
-class LitEditRecord(db.EmbeddedDocument):
-	lastUserEdited = db.StringField(max_length = 30, required = True)
-	date = db.DateTimeField(default = datetime.datetime.now, required = True)
-
-        def __repr__(self):
-            return '<ListEditRecord %s, %s>' % (self.lastUserEdited, self.date)
-
+        
+# OBET website user
 class User(UserMixin, db.Document):
     	name = db.StringField(max_length = 30, required = True, unique = True)
     	credentials = db.StringField(max_length = 64)
@@ -42,6 +45,8 @@ class User(UserMixin, db.Document):
     	member_since = db.DateTimeField(default = datetime.datetime.now)
         last_seen = db.DateTimeField(default = datetime.datetime.now)
         u_edit_record = db.SortedListField(db.EmbeddedDocumentField(UserEditRecord), ordering="date", reverse=True, default = [])
+        # Preferences: 
+        # Boolean values of whether the user wishes to see this field in their search results
         title = db.BooleanField(default = True)
         author = db.BooleanField(default = True)
         primaryField = db.BooleanField(default = True)
@@ -53,15 +58,17 @@ class User(UserMixin, db.Document):
         dateCreatedOn = db.BooleanField(default = False)
         lastModified = db.BooleanField(default = False)
         lastModifiedBy = db.BooleanField(default = False)
-        #list_of_fields = ["Title", "Author", "Primary Field","Source Title", "Editor", "Year Published", "Type", "Creator", "Date Created", "Last Modified", "Last Modified By"]
-        
+
+        # Add Index
         # meta = {'indexes': [
         # 	{'fields': ['$email', '$name'],
         # 	 'default_language': 'english',
         # 	 'weight': {'email': 100, 'name': 50}
         # 	}
         # ]}     
-        		
+        	
+        # To String for User obj	
+        # Indentation is off here
     	def __repr__(self):
  		return '<User %s, %s>' % (self.name, self.email)
  	
@@ -103,7 +110,6 @@ class User(UserMixin, db.Document):
  		self.confirmed = True
  		self.save()
  		return True
-
 
 	def activate(self):
  		if self.activated:
@@ -196,7 +202,7 @@ class User(UserMixin, db.Document):
 		self.save()
 		return True
 
-
+# Anonymous User
 class AnonymousUser(AnonymousUserMixin):
  	def can(self, permissions):
  		return False
@@ -204,6 +210,7 @@ class AnonymousUser(AnonymousUserMixin):
  	def is_administrator(self):
  		return False
 
+# Variables for Literature/Lit objects
 REFTYPES = ('Book Section', 'Edited Book', 'Journal Article', 'Journal Issue', 'Magazine Article', 'Media',
     'Newspaper Article', 'Report', 'Thesis', 'Website' )
 
@@ -216,6 +223,16 @@ FIELDS = (('Philosophy/Ethics/Theology','Philosophy/Ethics/Theology'),
             ('Nature Writing/Art/Literary Criticism','Nature Writing/Art/Literary Criticism'),
             ('Education/Living','Education/Living'))
 
+# Embedded document
+# Contains a record of an edit on a literature
+class LitEditRecord(db.EmbeddedDocument):
+    lastUserEdited = db.StringField(max_length = 30, required = True)
+    date = db.DateTimeField(default = datetime.datetime.now, required = True)
+
+    def __repr__(self):
+        return '<ListEditRecord %s, %s>' % (self.lastUserEdited, self.date)
+
+# Lit object
 class Lit(db.Document):
     	refType = db.StringField(max_length = 30, required = True, choices=REFTYPES)
         author = db.StringField(max_length = 150, unique_with = ['title','pages'])
@@ -234,13 +251,14 @@ class Lit(db.Document):
         notes = db.StringField(max_length = 20000)
         primaryField = db.StringField(required=True, choices=FIELDS)
         secondaryField = db.StringField(choices=FIELDS)
-    	# edition = db.IntField(default = None)
     	link = db.URLField(max_length = 300, default = None)
     	l_edit_record = db.SortedListField(db.EmbeddedDocumentField(LitEditRecord), default = [], ordering="date", reverse=True)
         last_edit = db.EmbeddedDocumentField(LitEditRecord)
         creator = db.StringField(max_length = 30, required = True)
         created_date = db.DateTimeField(default = datetime.datetime.now, required = True)
         DOI = db.StringField(max_length = 50)
+
+        # Index
     	# meta = {
      #        'indexes': [
     	# 	  {
@@ -252,12 +270,12 @@ class Lit(db.Document):
 
     	def __repr__(self):
  		return '<Lit %s, %s>' % (self.title, self.author)
-
-
+    
 class Permission:
 	ADDLIT = 0x01
 	ADMINISTER = 0x80
  	
+# User Role
 class Role(db.Document):
  	name = db.StringField(unique=True)
  	default = db.BooleanField(default = False)
